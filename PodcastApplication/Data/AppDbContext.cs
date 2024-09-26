@@ -1,0 +1,23 @@
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using PodcastApplication.Models;
+
+namespace PodcastApplication.Data
+{
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base (options)
+        {
+            
+        }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Episode> Episodes { get; set; }
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<Podcast> Podcasts { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<EpisodeLike> EpisodeLikes { get; set; }
+        public DbSet<PodcastLike> PodcastLikes { get; set; }
+    }
+}
