@@ -18,6 +18,27 @@ namespace PodcastApplication.Data
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<EpisodeLike> EpisodeLikes { get; set; }
-        public DbSet<PodcastLike> PodcastLikes { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<Playlist> Playlists { get; set; }
+        public DbSet<PlaylistItem> PlaylistItems { get; set; }
+
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Episode>()
+                .HasOne(e => e.Podcast)
+                .WithMany(p => p.Episodes)
+                .HasForeignKey(e => e.PodcastId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            
+        }
+
+
+
+
     }
 }

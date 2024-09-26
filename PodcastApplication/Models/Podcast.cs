@@ -1,4 +1,6 @@
-﻿namespace PodcastApplication.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace PodcastApplication.Models
 {
     public class Podcast : SharedProperties
     {
@@ -7,7 +9,13 @@
         public string? PodcastDescription { get; set; }
         public string? PodcastCoverImg { get; set; }
 
-        public ICollection<PodcastLike>? PodcastLikes { get; set; }
-        
+        [ForeignKey("Category")]
+        public int CategoryId { get; set; }
+        public Category? Category { get; set; }
+
+        public ICollection<Episode>? Episodes { get; set; }
+        public ICollection<Subscription>? Subscriptions { get; set; }
+        public ICollection<Rating>? Ratings { get; set; }
+
     }
 }

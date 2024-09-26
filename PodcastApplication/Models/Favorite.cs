@@ -2,17 +2,16 @@
 
 namespace PodcastApplication.Models
 {
-    public class PodcastLike : SharedProperties
+    public class Favorite
     {
-        public int PodcastLikeId { get; set; }
+        public int FavoriteId { get; set; }
 
         [ForeignKey("ApplicationUser")]
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }
 
-        [ForeignKey("Podcast")]
-        public Guid PodcastId { get; set; }
-        public Podcast? Podcast { get; set; }
-        
+        [ForeignKey("Episode")]
+        public Guid EpisodeId { get; set; }
+        public Episode? Episode { get; set; }
     }
 }

@@ -6,5 +6,6 @@
         public string? CategoryName { get; set; }
 
         public ICollection<ApplicationUser>? Creators { get; set; }
+        public ICollection<Podcast>? Podcasts { get; set; }
     }
 }

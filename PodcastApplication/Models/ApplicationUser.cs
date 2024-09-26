@@ -14,5 +14,7 @@ namespace PodcastApplication.Models
         [ForeignKey("Category")]
         public int? CreatorCategoryId { get; set; }
         public Category? CreatorCategory { get; set; }
+
     }
+
 }
