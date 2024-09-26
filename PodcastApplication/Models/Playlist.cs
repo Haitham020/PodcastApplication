@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PodcastApplication.Models
 {
-    public class Playlist
+    public class Playlist : SharedProperties
     {
         [Key]
         public int PlaylistId { get; set; }
