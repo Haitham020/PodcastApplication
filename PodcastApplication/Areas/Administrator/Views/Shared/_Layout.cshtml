@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Dashboard</title>
+    <title>Admin Dashboard - @ViewData["Title"]</title>
 
     <!-- Custom fonts for this template-->
     <link href="~/Dashboard/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -34,7 +34,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+                <div class="sidebar-brand-text mx-3">  Admin <sup>2</sup></div>
             </a>
 
             <!-- Divider -->
@@ -66,8 +66,10 @@
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Custom Components:</h6>
-                        <a class="collapse-item" href="buttons.html">Buttons</a>
-                        <a class="collapse-item" href="cards.html">Cards</a>
+                        <a class="collapse-item" href="buttons.html">Categories</a>
+                        <a class="collapse-item" href="cards.html">Podcasts</a>
+                        <a class="collapse-item" href="cards.html">Episodes</a>
+                        <a class="collapse-item" href="cards.html">Menus</a>
                     </div>
                 </div>
             </li>
@@ -122,17 +124,44 @@
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+                <a class="nav-link" asp-action="Index" asp-controller="Categories">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Charts</span>
+                    <span>Categories</span>
                 </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index" asp-controller="Podcasts">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Podcasts</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index" asp-controller="Episodes">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Episodes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index" asp-controller="Menus">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Menus</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <form method="post">
+                    <a class="nav-link" asp-action="Logout" asp-controller="Account">
+                        <i class="fas fa-fw fa-chart-area"></i>
+                        <span>Logout</span>
+                    </a>
+                </form>
+                
             </li>
 
             <!-- Nav Item - Tables -->
             <li class="nav-item">
                 <a class="nav-link" href="tables.html">
                     <i class="fas fa-fw fa-table"></i>
-                    <span>Tables</span>
+                    <span>All Users</span>
                 </a>
             </li>
 
@@ -144,13 +173,10 @@
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
 
-           
+
 
         </ul>
         <!-- End of Sidebar -->
-
-
-
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
@@ -336,7 +362,7 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">@User.Identity!.Name</span>
                                 <img class="img-profile rounded-circle"
                                      src="img/undraw_profile.svg">
                             </a>
@@ -367,26 +393,19 @@
 
                 </nav>
                 <!-- End of Topbar -->
-                
+
                 <div class="container">
                     @RenderBody()
+                    @await RenderSectionAsync("Scripts", required: false)
                 </div>
 
             </div>
 
 
-            
+
 
 
             <!-- End of Main Content -->
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2021</span>
-                    </div>
-                </div>
-            </footer>
             <!-- End of Footer -->
 
         </div>

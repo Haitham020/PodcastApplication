@@ -42,6 +42,13 @@ namespace PodcastApplication.Controllers
         {
             if (ModelState.IsValid)
             {
+                var existedEmail = await _userManager.FindByEmailAsync(model.Email!);
+                if (existedEmail != null)
+                {
+                    ModelState.AddModelError("Email", "Password or Email credentials wrong");
+                    return View(model);
+                }
+
                 ApplicationUser user = new ApplicationUser
                 {
                     UserName = model.UserName,
@@ -55,8 +62,7 @@ namespace PodcastApplication.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, userRole);
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Login", "Account");
                 }
 
                 foreach (var error in result.Errors)

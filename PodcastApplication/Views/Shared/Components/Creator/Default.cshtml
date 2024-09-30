@@ -1,0 +1,42 @@
+﻿@model IEnumerable<PodcastApplication.Models.ApplicationUser>
+
+
+
+
+
+<div class="owl-carousel owl-theme">
+
+    @foreach (var creator in Model)
+    {
+        <div class="owl-carousel-info-wrap item">
+            <img src="~/images/profile/@(string.IsNullOrEmpty(creator.ProfileImg) ? "userImg.png" : creator.ProfileImg)" class="owl-carousel-image img-fluid" alt="">
+
+            <div class="owl-carousel-info">
+                <h4 class="mb-2">
+                    @creator.UserName
+                    <img src="~/images/verified.png" class="owl-carousel-verified-image img-fluid" alt="">
+                </h4>
+
+                <span class="badge">Storytelling</span>
+
+                <span class="badge">Business</span>
+            </div>
+
+            <div class="social-share">
+                <ul class="social-icon">
+                    <li class="social-icon-item">
+                        <a href="#" class="social-icon-link bi-twitter"></a>
+                    </li>
+
+                    <li class="social-icon-item">
+                        <a href="#" class="social-icon-link bi-facebook"></a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    }
+
+</div>
+
+

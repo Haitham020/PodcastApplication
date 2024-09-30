@@ -13,6 +13,10 @@ namespace PodcastApplication.Models
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
 
+        [ForeignKey("ApplicationUser")]
+        public string? CreatorId { get; set; }
+        public ApplicationUser? Creator { get; set; }
+
         public ICollection<Episode>? Episodes { get; set; }
         public ICollection<Subscription>? Subscriptions { get; set; }
         public ICollection<Rating>? Ratings { get; set; }

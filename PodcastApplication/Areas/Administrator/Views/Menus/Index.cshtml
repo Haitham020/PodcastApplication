@@ -1,0 +1,57 @@
+﻿@model IEnumerable<PodcastApplication.Models.Menu>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MenuId)
+            </th><th>
+                @Html.DisplayNameFor(model => model.MenuTitle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ActionUrl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ControllerUrl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ParentMenuId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MenuId)
+            </td><td>
+                @Html.DisplayFor(modelItem => item.MenuTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ActionUrl)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ControllerUrl)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ParentMenuId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.MenuId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.MenuId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.MenuId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

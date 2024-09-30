@@ -176,6 +176,9 @@ namespace PodcastApplication.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CreatorGenre")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateJoined")
                         .HasColumnType("datetime2");
 
@@ -319,6 +322,9 @@ namespace PodcastApplication.Migrations
                     b.Property<TimeSpan>("EpisodeDuration")
                         .HasColumnType("time");
 
+                    b.Property<int>("EpisodeNumber")
+                        .HasColumnType("int");
+
                     b.Property<string>("EpisodeTitle")
                         .HasColumnType("nvarchar(max)");
 
@@ -368,6 +374,29 @@ namespace PodcastApplication.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("EpisodeLikes");
+                });
+
+            modelBuilder.Entity("PodcastApplication.Models.EpisodeListener", b =>
+                {
+                    b.Property<int>("EpisodeListenerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EpisodeListenerId"));
+
+                    b.Property<Guid>("EpisodeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("EpisodeListenerId");
+
+                    b.HasIndex("EpisodeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EpisodeListeners");
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Favorite", b =>
@@ -500,6 +529,9 @@ namespace PodcastApplication.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CreatorId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -518,6 +550,8 @@ namespace PodcastApplication.Migrations
                     b.HasKey("PodcastId");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Podcasts");
                 });
@@ -676,6 +710,23 @@ namespace PodcastApplication.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("PodcastApplication.Models.EpisodeListener", b =>
+                {
+                    b.HasOne("PodcastApplication.Models.Episode", "Episode")
+                        .WithMany("EpisodeListeners")
+                        .HasForeignKey("EpisodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PodcastApplication.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Episode");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("PodcastApplication.Models.Favorite", b =>
                 {
                     b.HasOne("PodcastApplication.Models.Episode", "Episode")
@@ -737,7 +788,13 @@ namespace PodcastApplication.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PodcastApplication.Models.ApplicationUser", "Creator")
+                        .WithMany("Podcasts")
+                        .HasForeignKey("CreatorId");
+
                     b.Navigation("Category");
+
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Rating", b =>
@@ -774,6 +831,11 @@ namespace PodcastApplication.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("PodcastApplication.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Podcasts");
+                });
+
             modelBuilder.Entity("PodcastApplication.Models.Category", b =>
                 {
                     b.Navigation("Podcasts");
@@ -784,6 +846,8 @@ namespace PodcastApplication.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("EpisodeLikes");
+
+                    b.Navigation("EpisodeListeners");
 
                     b.Navigation("Favorites");
                 });

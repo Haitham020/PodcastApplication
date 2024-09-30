@@ -12,8 +12,9 @@ namespace PodcastApplication.Models
         public string? ProfileImg { get; set; }
         public string? ProfileBio { get; set; }
         public int Age { get; set; }
+        public string? CreatorGenre { get; set; }
       
-
+        public ICollection<Podcast>? Podcasts { get; set; }
     }
 
 }

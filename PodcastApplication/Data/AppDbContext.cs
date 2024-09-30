@@ -21,6 +21,7 @@ namespace PodcastApplication.Data
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<PlaylistItem> PlaylistItems { get; set; }
+        public DbSet<EpisodeListener> EpisodeListeners { get; set; }
 
 
 

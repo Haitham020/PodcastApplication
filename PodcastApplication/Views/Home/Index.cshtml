@@ -1,6 +1,12 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
 
-<p>Use this page to detail your site's privacy policy.</p>
+@await Component.InvokeAsync("Creator")
+
+@await Component.InvokeAsync("Episode")
+
+@await Component.InvokeAsync("Category")
+
+@await Component.InvokeAsync("TrendingEpisode")
