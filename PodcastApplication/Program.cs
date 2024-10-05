@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PodcastApplication.Data;
@@ -13,6 +14,18 @@ namespace PodcastApplication
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.Limits.MaxRequestBodySize = 5368709120;
+            });
+
+            builder.Services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 5368709120;
+            });
+
 
             builder.Services.AddDbContext<AppDbContext>(options =>
             {

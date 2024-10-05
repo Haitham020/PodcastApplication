@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PodcastApplication.Models
 {
@@ -11,12 +12,9 @@ namespace PodcastApplication.Models
         public int PlaylistId { get; set; }
         public Playlist? Playlist { get; set; }
         [ForeignKey("Podcast")]
+        
         public Guid PodcastId { get; set; }
         public Podcast? Podcast { get; set; }
-
-        [ForeignKey("Episode")]
-        public Guid EpisodeId { get; set; }
-        public Episode? Episode { get; set; }
 
     }
 }

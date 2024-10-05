@@ -1,0 +1,86 @@
+﻿@model ApplicationUser
+
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-4 col-md-5">
+            <div class="card profile-card shadow-lg">
+                <div class="card-body text-center">
+                    <img src="~/images/user-placeholder.png" class="profile-img img-fluid rounded-circle mb-3" alt="Profile Image">
+                    <h5 class="card-title">@Model.UserName</h5>
+                    <p class="text-muted">@Model.Email</p>
+                    <p><strong>Joined:</strong> @Model.DateJoined.ToString("MMMM dd, yyyy")</p>
+                    <p><strong>Country:</strong> @Model.Country</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-7">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h4 class="mb-4">Your Activity</h4>
+
+                    <div class="row mb-3">
+                        <div class="col-6 col-md-4">
+                            <a href="@Url.Action("MyPlaylists", "Playlists")" class="btn btn-outline-primary btn-block">
+                                <i class="bi bi-music-note-list me-2"></i> Playlists
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="@Url.Action("MyFavorites", "Favorites")" class="btn btn-outline-success btn-block">
+                                <i class="bi bi-heart me-2"></i> Favorites
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="@Url.Action("MyEpisodeLikes", "EpisodeLikes")" class="btn btn-outline-info btn-block">
+                                <i class="bi bi-hand-thumbs-up me-2"></i> Episode Likes
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="@Url.Action("MySubscriptions", "Subscriptions")" class="btn btn-outline-warning btn-block">
+                                <i class="bi bi-person-check me-2"></i> Podcast Followings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-card {
+        border: none;
+        border-radius: 10px;
+        background-color: #f7f8fa;
+    }
+
+    .profile-img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .btn-block {
+        width: 100%;
+        margin-bottom: 15px;
+        padding: 10px;
+    }
+
+    .btn-outline-primary, .btn-outline-success, .btn-outline-info, .btn-outline-warning {
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .shadow-lg {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+</style>
+
+

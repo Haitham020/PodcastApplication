@@ -51,25 +51,34 @@ namespace PodcastApplication.Areas.Administrator.Controllers
         // GET: Administrator/Episodes/Create
         public IActionResult Create()
         {
-            ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastId");
+            ViewBag.Podcast = new SelectList(_context.Podcasts, "PodcastId", "PodcastTitle");
             return View();
         }
 
-        // POST: Administrator/Episodes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EpisodeId,EpisodeTitle,EpisodeDescription,AudioFile,EpisodeDuration,EpisodeNumber,PodcastId,IsActive,IsDeleted,CreatedAt")] Episode episode)
+        public async Task<IActionResult> Create(Episode episode, IFormFile audioFile)
         {
             if (ModelState.IsValid)
             {
+                if (audioFile != null && audioFile.Length > 0)
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(),
+                        "wwwroot/audio", audioFile.FileName);
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await audioFile.CopyToAsync(stream);
+                    }
+
+                    episode.AudioFile = audioFile.FileName;
+                }
                 episode.EpisodeId = Guid.NewGuid();
                 _context.Add(episode);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastId", episode.PodcastId);
+            ViewBag.Podcast = new SelectList(_context.Podcasts, "PodcastId", "PodcastTitle");
             return View(episode);
         }
 
@@ -95,7 +104,7 @@ namespace PodcastApplication.Areas.Administrator.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("EpisodeId,EpisodeTitle,EpisodeDescription,AudioFile,EpisodeDuration,EpisodeNumber,PodcastId,IsActive,IsDeleted,CreatedAt")] Episode episode)
+        public async Task<IActionResult> Edit(Guid id, Episode episode)
         {
             if (id != episode.EpisodeId)
             {
@@ -153,7 +162,8 @@ namespace PodcastApplication.Areas.Administrator.Controllers
             var episode = await _context.Episodes.FindAsync(id);
             if (episode != null)
             {
-                _context.Episodes.Remove(episode);
+                episode.IsDeleted = true;
+                episode.IsActive = false;
             }
 
             await _context.SaveChangesAsync();

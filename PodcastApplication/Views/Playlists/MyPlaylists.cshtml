@@ -1,0 +1,44 @@
+﻿@model List<Playlist>
+
+
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+
+<div class="container">
+    <h2>Your Playlists</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            You have no playlists yet. <a href="@Url.Action("Create", "Playlists")">Create a new playlist</a>!
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var playlist in Model)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@playlist.PlaylistName</h5>
+                            <p class="card-text">@playlist.PlaylistDescription</p>
+                            <a asp-action="SavedItemsInPlaylist" asp-controller="Playlists" asp-route-playlistId="@playlist.PlaylistId"
+                            class="btn btn-primary">View Playlist</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<a href="@Url.Action("Create", "Playlists")">Create a new playlist</a>
+
+
+
+

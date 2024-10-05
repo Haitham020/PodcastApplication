@@ -1,0 +1,227 @@
+﻿@model Podcast
+
+
+@{
+    ViewData["Title"] = "Podcast Details";
+}
+
+<style>
+    .audio-player {
+        width: 100%; 
+        margin-top: 15px; 
+    }
+
+    .custom-block {
+        padding: 15px; 
+    }
+
+    .custom-block-icon-wrap {
+        position: relative;
+        width: 100%;
+    }
+
+</style>
+
+<section class="latest-podcast-section section-padding pb-0" id="section_2">
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-lg-10 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">@Model.PodcastTitle</h4>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3 col-12">
+                        <div class="custom-block-icon-wrap">
+                            <div class="custom-block-image-wrap custom-block-image-detail-page">
+                                <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-9 col-12">
+                        <div class="custom-block-info">
+                            <div class="custom-block-top d-flex mb-1">
+
+                                <h4>
+                                    @Model.Episodes!.Count() Episodes
+                                </h4>
+
+                            </div>
+
+                            <h2 class="mb-2">@Model.PodcastTitle</h2>
+                            <h2 class="mb-2">@Model.Category!.CategoryName</h2>
+
+                            <p>@Model.PodcastDescription</p>
+
+
+
+                            <div class="profile-block profile-detail-block d-flex flex-wrap align-items-center mt-5">
+                                <div class="d-flex mb-3 mb-lg-0 mb-md-0">
+                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+
+                                    <p>
+                                        @Model.Creator!.UserName
+                                        <img src="images/verified.png" class="verified-image img-fluid" alt="">
+                                        <strong>@Model.Creator.CreatorGenre</strong>
+                                    </p>
+                                </div>
+
+                                <ul class="social-icon ms-lg-auto ms-md-auto">
+                                    <li class="social-icon-item">
+                                        <a href="#" class="social-icon-link bi-instagram"></a>
+                                    </li>
+
+                                    <li class="social-icon-item">
+                                        <a href="#" class="social-icon-link bi-twitter"></a>
+                                    </li>
+
+                                    <li class="social-icon-item">
+                                        <a href="#" class="social-icon-link bi-whatsapp"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+
+<section class="latest-podcast-section section-padding pb-0" id="section_2">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-12 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">@Model.PodcastTitle episodes</h4>
+                </div>
+            </div>
+
+            @foreach (var episode in Model.Episodes!)
+            {
+                <div class="col-lg-6 col-12 mb-4 mb-lg-0">
+                    <div class="custom-block d-flex">
+                        <div class="">
+                            <div class="custom-block-icon-wrap">
+                                <div class="section-overlay"></div>
+                                <a href="detail-page.html" class="custom-block-image-wrap">
+                                    <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
+                                </a>
+                            </div>
+
+
+                            <div class="audio-player mt-3">
+                                <audio controls>
+                                    <source src="~/audio/@episode.AudioFile" type="audio/mpeg">
+                                </audio>
+                            </div>
+
+                            <div class="mt-2">
+                                <a href="#" class="btn custom-btn">Follow</a>
+                            </div>
+                        </div>
+
+                        <div class="custom-block-info">
+                            <div class="custom-block-top d-flex mb-1">
+                                <small class="me-4">
+                                    <i class="bi-clock-fill custom-icon"></i>
+                                    @episode.EpisodeDuration
+                                </small>
+
+                                <small class="badge">
+                                    Episode @episode.EpisodeNumber of <span>@episode.Podcast!.Episodes!.Count()</span>
+                                </small>
+                            </div>
+
+                            <h5 class="mb-2">
+                                <a href="detail-page.html">
+                                    @episode.EpisodeTitle  | @episode.Podcast.PodcastTitle
+                                </a>
+                            </h5>
+
+                            <p class="mb-0">@episode.EpisodeDescription</p>
+
+                            <div class="custom-block-bottom d-flex justify-content-between mt-3">
+                                <a href="#" class="bi-headphones me-1">
+                                    <span>@episode.EpisodeListeners!.Count()</span>
+                                </a>
+
+                                <a href="#" class="bi-heart me-1">
+                                    <span>@episode.EpisodeLikes!.Count()</span>
+                                </a>
+
+                                <a href="#" class="bi-chat me-1">
+                                    <span>@episode.Comments!.Count()</span>
+                                </a>
+
+                                <a href="#" class="bi-download">
+                                    <span>50k</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column ms-auto">
+                            <a href="#" class="badge ms-auto">
+                                <i class="bi-heart"></i>
+                            </a>
+
+                            <a href="#" class="badge ms-auto">
+                                <i class="bi-bookmark"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+
+<script>
+    const audio = document.getElementById("audio");
+    const playPauseButton = document.getElementById("play-pause-button");
+    const volumeControl = document.getElementById("volume-control");
+    const progressBar = document.getElementById("progress-bar");
+    const currentTimeDisplay = document.getElementById("current-time");
+    const totalTimeDisplay = document.getElementById("total-time");
+
+    let isPlaying = false;
+
+    playPauseButton.addEventListener("click", () => {
+        if (isPlaying) {
+            audio.pause();
+            playPauseButton.textContent = "Play";
+        } else {
+            audio.play();
+            playPauseButton.textContent = "Pause";
+        }
+        isPlaying = !isPlaying;
+    });
+
+    volumeControl.addEventListener("input", () => {
+        audio.volume = volumeControl.value;
+    });
+
+    audio.addEventListener("timeupdate", () => {
+        const currentTime = audio.currentTime;
+        const duration = audio.duration;
+
+        const currentMinutes = Math.floor(currentTime / 60);
+        const currentSeconds = Math.floor(currentTime % 60);
+        const totalMinutes = Math.floor(duration / 60);
+        const totalSeconds = Math.floor(duration % 60);
+
+        currentTimeDisplay.textContent = `${currentMinutes}:${currentSeconds < 10 ? '0' : ''}${currentSeconds}`;
+        totalTimeDisplay.textContent = `${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
+
+        const progress = (currentTime / duration) * 100;
+        progressBar.style.width = `${progress}%`;
+    });
+</script>
+
+

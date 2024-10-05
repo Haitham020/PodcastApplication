@@ -28,7 +28,7 @@ namespace PodcastApplication.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-           
+
             RegisterViewModel model = new RegisterViewModel
             {
                 Countries = CountryList.GetCountries()
@@ -54,8 +54,20 @@ namespace PodcastApplication.Controllers
                     UserName = model.UserName,
                     Email = model.Email,
                     Age = model.Age,
-                    Country = model.Country
+                    Country = model.Country,
+                    DateJoined = DateTime.Now
+
                 };
+                if (userRole == "Creator")
+                {
+                    user.Active = false;
+                    user.InActive = true;
+                }
+                else if(userRole == "Listener")
+                {
+                    user.Active = true;
+                    user.InActive = false;
+                }
 
                 var result = await _userManager.CreateAsync(user, model.Password!);
 
@@ -89,18 +101,23 @@ namespace PodcastApplication.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email!);
-                if (user != null)
+                if (user != null && user.Active == true)
                 {
                     var result = await _signInManager.PasswordSignInAsync(user.UserName!, model.Password!, model.RememberMe, lockoutOnFailure: false);
                     if (result.Succeeded)
                     {
                         return RedirectToAction("Index", "Home");
                     }
+                   
                     else
                     {
-                        ModelState.AddModelError("", "Error Logging In, Please Try Again.");
+                        ModelState.AddModelError("", "Error Logging In, Check Credentials");
                     }
                     return View(model);
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Please Wait Until Admin Approval");
                 }
 
             }
@@ -113,8 +130,6 @@ namespace PodcastApplication.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
-
-
     }
 
 }

@@ -464,10 +464,17 @@ namespace PodcastApplication.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PlaylistDescription")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PlaylistImg")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PlaylistName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -491,9 +498,6 @@ namespace PodcastApplication.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("EpisodeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -507,8 +511,6 @@ namespace PodcastApplication.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("PlaylistItemId");
-
-                    b.HasIndex("EpisodeId");
 
                     b.HasIndex("PlaylistId");
 
@@ -755,12 +757,6 @@ namespace PodcastApplication.Migrations
 
             modelBuilder.Entity("PodcastApplication.Models.PlaylistItem", b =>
                 {
-                    b.HasOne("PodcastApplication.Models.Episode", "Episode")
-                        .WithMany()
-                        .HasForeignKey("EpisodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PodcastApplication.Models.Playlist", "Playlist")
                         .WithMany("PlaylistItems")
                         .HasForeignKey("PlaylistId")
@@ -772,8 +768,6 @@ namespace PodcastApplication.Migrations
                         .HasForeignKey("PodcastId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Episode");
 
                     b.Navigation("Playlist");
 

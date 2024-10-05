@@ -42,9 +42,15 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" asp-action="Index" asp-controller="ControlPanel">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" asp-area="Home" asp-action="Index" asp-controller="Home">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Home</span>
                 </a>
             </li>
 
@@ -154,7 +160,7 @@
                         <span>Logout</span>
                     </a>
                 </form>
-                
+
             </li>
 
             <!-- Nav Item - Tables -->

@@ -14,11 +14,13 @@ namespace PodcastApplication.ViewComponents
         }
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var categories = await db.Categories.Select(c => new
-            {
-                Category = c,
-                EpisodeCount = c.Podcasts!.SelectMany(p => p.Episodes!).Count()
-            }).Take(4).ToListAsync();
+            var categories = await db.Categories.Where(c => c.IsActive)
+                .Select(c => new
+                {
+                    Category = c,
+                    EpisodeCount = c.Podcasts!.Where(p => p.IsActive)
+                .SelectMany(p => p.Episodes!).Count(e => e.IsActive)
+                }).Take(4).ToListAsync();
 
             return View(categories);
 

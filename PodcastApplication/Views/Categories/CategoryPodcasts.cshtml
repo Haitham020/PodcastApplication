@@ -1,0 +1,88 @@
+﻿@model Category
+
+
+@{
+    ViewData["Title"] = "Category Podcasts";
+}
+
+
+<style>
+    .custom-block {
+    margin-bottom: 20px;
+    }
+
+</style>
+
+<section class="trending-podcast-section section-padding">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-12 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">@Model.CategoryName Podcasts</h4>
+                </div>
+            </div>
+            @if(Model.Podcasts!.Any() && Model.Podcasts != null)
+            {
+                @foreach (var podcast in Model.Podcasts)
+                {
+
+                    @* var ratingCount = podcast.Ratings?.Count() ?? 0;
+            var averageRating = ratingCount > 0 ? podcast.Ratings!.Average(r => r.RatingValue) : 0; *@
+
+                    <div class="col-lg-4 col-12 mb-4">
+                        <div class="custom-block custom-block-full mb-4">
+                            <div class="custom-block-image-wrap">
+                                <a href="detail-page.html">
+                                    <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
+                                </a>
+                            </div>
+
+                            <div class="custom-block-info">
+                                <h5 class="mb-2">
+                                    <a asp-action="PodcastDetails" asp-controller="Podcasts"
+                                    asp-route-id="@podcast.PodcastId">
+                                        @podcast.PodcastTitle
+                                    </a>
+                                </h5>
+
+                                <div class="profile-block d-flex">
+                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+
+                                    <p>
+                                        @podcast.Creator!.UserName
+                                        <strong>@podcast.Creator.CreatorGenre</strong>
+                                    </p>
+                                </div>
+
+                                <p class="mb-0">@podcast.PodcastDescription!.Substring(0, 30)...</p>
+
+                                <div class="custom-block-bottom d-flex justify-content-between mt-3">
+
+                                    <a href="#" class="bi-heart me-1">
+                                        <span>@* @podcast.Subscriptions!.Count() Followers *@ </span>
+                                    </a>
+
+                                    <a href="#" class="bi-star me-1">
+                                        <span>@* @averageRating.ToString("F1") stars *@</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="social-share d-flex flex-column ms-auto">
+                                <a href="#" class="fa-solid fa-plus">
+                                    <i class="bi-heart"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <h3>No podcasts available in this category ):</h3>
+            }
+            
+        </div>
+    </div>
+</section>

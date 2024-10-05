@@ -43,16 +43,36 @@
                 <select asp-for="PodcastId" class="form-control" asp-items="ViewBag.PodcastId"></select>
                 <span asp-validation-for="PodcastId" class="text-danger"></span>
             </div>
+            
+
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                    <input id="IsActive" class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
                 </label>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsDeleted" /> @Html.DisplayNameFor(model => model.IsDeleted)
+                    <input id="IsDeleted" class="form-check-input" asp-for="IsDeleted" /> @Html.DisplayNameFor(model => model.IsDeleted)
                 </label>
             </div>
+
+
+
+            <script>
+                document.getElementById("IsActive").addEventListener("change", function () {
+                    if (this.checked) {
+                        document.getElementById("IsDeleted").checked = false;
+                    }
+                });
+
+                document.getElementById("IsDeleted").addEventListener("change", function () {
+                    if (this.checked) {
+                        document.getElementById("IsActive").checked = false;
+                    }
+                });
+            </script>
+
+
             <div class="form-group">
                 <label asp-for="CreatedAt" class="control-label"></label>
                 <input asp-for="CreatedAt" class="form-control" />

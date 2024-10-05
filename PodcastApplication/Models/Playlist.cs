@@ -7,8 +7,12 @@ namespace PodcastApplication.Models
     {
         [Key]
         public int PlaylistId { get; set; }
+        [Required(ErrorMessage = "Enter Playlist Name")]
         public string? PlaylistName { get; set; }
         public string? PlaylistDescription { get; set; }
+        public string? PlaylistImg {  get; set; }
+        public bool IsPublic { get; set; }
+
         [ForeignKey("ApplicationUser")]
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }

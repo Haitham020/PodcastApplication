@@ -1,0 +1,174 @@
+﻿@model IEnumerable<Podcast>
+
+@{
+    ViewData["Title"] = "Podcasts";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    
+
+
+    .custom-block {
+        margin-bottom: 20px;
+    }
+
+    .modal-backdrop {
+        position: relative;
+        z-index: -1
+    }
+
+    .rating-icon {
+        cursor: pointer;
+        font-size: 18px;
+        color: gold;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .playlist-box {
+        display: none;
+        margin-top: 10px;
+    }
+
+    .playlist-item {
+        padding: 5px 0;
+    }
+</style>
+
+<section class="trending-podcast-section section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">All Podcasts</h4>
+                </div>
+            </div>
+
+            @foreach (var podcast in Model)
+            {
+                var ratingCount = podcast.Ratings?.Count() ?? 0;
+                var averageRating = ratingCount > 0 ? podcast.Ratings!.Average(r => r.RatingValue) : 0;
+
+                <div class="col-lg-4 col-12 mb-4">
+                    <div class="custom-block custom-block-full mb-4">
+                        <div class="custom-block-image-wrap">
+                            <a href="detail-page.html">
+                                <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
+                            </a>
+                        </div>
+
+                        <div class="custom-block-info">
+                            <h5 class="mb-2">
+                                <a asp-action="PodcastDetails" asp-controller="Podcasts"
+                                   asp-route-id="@podcast.PodcastId">
+                                    @podcast.PodcastTitle
+                                </a>
+                            </h5>
+
+                            <div class="profile-block d-flex">
+                                <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                <p>
+                                    @podcast.Creator!.UserName
+                                    <strong>@podcast.Creator.CreatorGenre</strong>
+                                </p>
+                            </div>
+
+                            <p class="mb-0">@podcast.PodcastDescription</p>
+
+                            <div class="custom-block-bottom d-flex justify-content-between mt-3">
+                                <a href="#" class="bi-heart me-1">
+                                    <span>@podcast.Subscriptions!.Count() Followers</span>
+                                </a>
+
+                                <!-- Ratings with clickable icon -->
+                                <a href="#" class="bi-star me-1 rating-icon">
+                                    <span>@averageRating.ToString("F1") stars</span>
+                                </a>
+                                
+
+                                <!-- Open Add playlist modal from here -->
+                                <a href="#" class="bi-plus-circle" data-bs-toggle="modal" data-bs-target="#playlistModal-@podcast.PodcastId">
+         
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal for Playlist Selection -->
+                <div class="modal fade" id="playlistModal-@podcast.PodcastId" aria-labelledby="playlistModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="playlistModalLabel">Add to Playlist</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Select playlists to add <strong>@podcast.PodcastTitle</strong>:</p>
+                                <form id="playlistForm-@podcast.PodcastId" method="post" asp-action="AddToPlaylists" asp-controller="Playlists">
+                                    <input type="hidden" name="podcastId" value="@podcast.PodcastId" />
+                                    @foreach (var playlist in ViewBag.UserPlaylists)
+                                    {
+                                        <div class="form-check playlist-item">
+                                            <input class="form-check-input" type="checkbox" id="playlist-@playlist.PlaylistId" name="playlistIds" value="@playlist.PlaylistId">
+                                            <label class="form-check-label" for="playlist-@playlist.PlaylistId">
+                                                @playlist.PlaylistName
+                                            </label>
+                                        </div>
+                                    }
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" onclick="submitPlaylists('@podcast.PodcastId')">Add to Playlist</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+
+
+
+<script>
+    function submitPlaylists(podcastId) {
+        var form = document.getElementById('playlistForm-' + podcastId);
+
+
+        var checkboxes = form.querySelectorAll('input[name="playlistIds"]:checked');
+        if (checkboxes.length === 0) {
+            alert("No playlist(s) was selected");
+            return;
+        }
+
+        var formData = new FormData(form);
+
+        
+        fetch('/Playlists/AddToPlaylists', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Podcast added to playlist(s) successfully!');
+                    
+                    $('#playlistModal-' + podcastId).modal('hide'); 
+                   
+                } 
+                else {
+                    alert("Already Exists In Playlist(s)")
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+

@@ -54,7 +54,9 @@ namespace PodcastApplication.Areas.Administrator.Controllers
                     UserName = model.UserName,
                     Email = model.Email,
                     Age = model.Age,
-                    Country = model.Country
+                    Country = model.Country,
+                    Active = true,
+                    InActive = false,
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password!);

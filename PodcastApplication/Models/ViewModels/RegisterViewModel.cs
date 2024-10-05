@@ -25,7 +25,6 @@ namespace PodcastApplication.Models.ViewModels
         [Range(0, 120, ErrorMessage = "Age must be between 0 and 120.")]
         public int Age { get; set; }
         public string? Country { get; set; }
-
         public List<IdentityRole>? Roles { get; set; }
 
         public List<string> Countries { get; set; } = CountryList.GetCountries();

@@ -52,8 +52,8 @@ namespace PodcastApplication.Areas.Administrator.Controllers
         // GET: Administrator/Podcasts/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId");
-            ViewData["CreatorId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewBag.Category = new SelectList(_context.Categories, "CategoryId", "CategoryName");
+            ViewBag.Creator = new SelectList(_context.Users, "Id", "UserName");
             return View();
         }
 
@@ -62,7 +62,7 @@ namespace PodcastApplication.Areas.Administrator.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PodcastId,PodcastTitle,PodcastDescription,PodcastCoverImg,CategoryId,CreatorId,IsActive,IsDeleted,CreatedAt")] Podcast podcast)
+        public async Task<IActionResult> Create(Podcast podcast)
         {
             if (ModelState.IsValid)
             {
@@ -71,8 +71,8 @@ namespace PodcastApplication.Areas.Administrator.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", podcast.CategoryId);
-            ViewData["CreatorId"] = new SelectList(_context.Users, "Id", "Id", podcast.CreatorId);
+            ViewBag.Category = new SelectList(_context.Categories, "CategoryId", "CategoryName");
+            ViewBag.Creator = new SelectList(_context.Users, "Id", "UserName");
             return View(podcast);
         }
 
@@ -99,7 +99,7 @@ namespace PodcastApplication.Areas.Administrator.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("PodcastId,PodcastTitle,PodcastDescription,PodcastCoverImg,CategoryId,CreatorId,IsActive,IsDeleted,CreatedAt")] Podcast podcast)
+        public async Task<IActionResult> Edit(Guid id, Podcast podcast)
         {
             if (id != podcast.PodcastId)
             {
@@ -159,7 +159,8 @@ namespace PodcastApplication.Areas.Administrator.Controllers
             var podcast = await _context.Podcasts.FindAsync(id);
             if (podcast != null)
             {
-                _context.Podcasts.Remove(podcast);
+                podcast.IsDeleted = true;
+                podcast.IsActive = false;
             }
 
             await _context.SaveChangesAsync();

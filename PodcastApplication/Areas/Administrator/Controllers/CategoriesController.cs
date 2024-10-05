@@ -145,7 +145,8 @@ namespace PodcastApplication.Areas.Administrator.Controllers
             var category = await _context.Categories.FindAsync(id);
             if (category != null)
             {
-                _context.Categories.Remove(category);
+                category.IsDeleted = true;
+                category.IsActive = false;
             }
 
             await _context.SaveChangesAsync();
