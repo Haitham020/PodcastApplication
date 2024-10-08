@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PodcastApplication.Data;
 using PodcastApplication.Models;
+using NAudio.Wave;
 
 namespace PodcastApplication.Areas.Administrator.Controllers
 {
@@ -72,7 +73,18 @@ namespace PodcastApplication.Areas.Administrator.Controllers
                     }
 
                     episode.AudioFile = audioFile.FileName;
+
+                    using (var audioFileReader = new AudioFileReader(filePath))
+                    {
+                        episode.EpisodeDuration = TimeSpan.FromSeconds(Math.Round(audioFileReader.TotalTime.TotalSeconds));
+                    }
+
                 }
+                
+                episode.EpisodeNumber = 1;
+                episode.IsActive = true;
+                episode.IsDeleted = false;
+
                 episode.EpisodeId = Guid.NewGuid();
                 _context.Add(episode);
                 await _context.SaveChangesAsync();

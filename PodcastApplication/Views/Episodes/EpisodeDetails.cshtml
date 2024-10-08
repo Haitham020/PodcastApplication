@@ -1,19 +1,45 @@
 ﻿@model EpisodeDetailViewModel
+@using PodcastApplication.Data;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
+@inject AppDbContext _db
+
+@{
+    var userId = _userManager.GetUserId(User);
+    var isLiked = _db.EpisodeLikes.FirstOrDefault(x => x.UserId == userId && x.EpisodeId == Model.Episode!.EpisodeId);
+}
 
 
 @{
     ViewData["Title"] = "Episode Details";
 }
 
+
+<style>
+
+    #like-icon {
+        transition: transform 0.3s ease;
+    }
+
+        #like-icon.liked {
+            transform: scale(1.3);
+        }
+
+</style>
+
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+
 <section class="latest-podcast-section section-padding pb-0" id="section_2">
     <div class="container">
         <div class="row justify-content-center">
-
             <div class="col-lg-10 col-12">
                 <div class="section-title-wrap mb-5">
                     <h4 class="section-title">@Model.Episode!.EpisodeTitle</h4>
                 </div>
-
                 <div class="row">
                     <div class="col-lg-3 col-12">
                         <div class="custom-block-icon-wrap">
@@ -27,47 +53,66 @@
                         <div class="custom-block-info">
                             <div class="custom-block-top d-flex mb-1">
                                 <small class="me-4">
-                                    <a href="#">
-                                        <i class="bi-play"></i>
-                                        Play now
-                                    </a>
+                                    <button id="playPauseBtn" class="btn btn-primary"><i class="bi-play"></i> Play now</button>
                                 </small>
-                                
                                 <small>
-                                    <i class="bi-clock-fill custom-icon"></i>
-                                    @Model.Episode.EpisodeDuration
+                                    <i class="bi-clock-fill custom-icon"></i> @Model.Episode.EpisodeDuration
                                 </small>
-
-                                <small class="ms-auto">Episode <span class="badge">15</span></small>
+                                <small class="ms-auto">
+                                    Episode <span class="badge">
+                                        @Model.EpisodeNumber
+                                    </span>
+                                </small>
+                                <small class="ms-auto">Likes <span id="like-count" class="badge">@Model.Episode.EpisodeLikes!.Count()</span></small>
                             </div>
-
                             <h2 class="mb-2">@Model.Episode.EpisodeTitle</h2>
-                            <h2 class="mb-2">@Model.Episode.Podcast!.Category!.CategoryName</h2>
-
+                            <h2 class="mb-2">@Model.Episode.Podcast!.PodcastTitle</h2>
                             <p>@Model.Episode.EpisodeDescription</p>
 
-                            
+                            <!-- Audio Player Section -->
+                            <div class="audio-player">
+                                <audio id="audioPlayer" src="~/audio/@Model.Episode.AudioFile" preload="metadata" controls></audio>
+                                <div class="audio-controls">
+                                    <button class="btn" id="rewindBtn">⏪ 15s</button>
+
+                                    <button class="btn" id="forwardBtn">⏩ 15s</button>
+                                    <span id="currentTime">00:00</span> / <span id="totalTime">00:00</span>
+                                </div>
+                            </div>
+                            <div>
+                                @if (_signInManager.IsSignedIn(User))
+                                {
+                                    if (isLiked != null)
+                                    {
+                                        <button id="likeBtn" class="btn btn-secondary" onclick="toggleLike('@Model.Episode!.EpisodeId', false)">
+                                            <i id="like-icon" class="fas fa-heart" style="color: red;"></i> <!-- Filled heart for liked -->
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button id="likeBtn" class="btn btn-secondary" onclick="toggleLike('@Model.Episode!.EpisodeId', true)">
+                                            <i id="like-icon" class="far fa-heart" style="color: white;"></i> <!-- Outlined heart for unliked -->
+                                        </button>
+                                    }
+                                }
+                            </div>
 
                             <div class="profile-block profile-detail-block d-flex flex-wrap align-items-center mt-5">
                                 <div class="d-flex mb-3 mb-lg-0 mb-md-0">
                                     <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
-
                                     <p>
                                         @Model.Episode.Podcast!.Creator!.UserName
-                                        <img src="images/verified.png" class="verified-image img-fluid" alt="">
+                                        <img src="~/images/verified.png" class="verified-image img-fluid" alt="">
                                         <strong>@Model.Episode.Podcast.Creator.CreatorGenre</strong>
                                     </p>
                                 </div>
-
                                 <ul class="social-icon ms-lg-auto ms-md-auto">
                                     <li class="social-icon-item">
                                         <a href="#" class="social-icon-link bi-instagram"></a>
                                     </li>
-
                                     <li class="social-icon-item">
                                         <a href="#" class="social-icon-link bi-twitter"></a>
                                     </li>
-
                                     <li class="social-icon-item">
                                         <a href="#" class="social-icon-link bi-whatsapp"></a>
                                     </li>
@@ -77,7 +122,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
@@ -92,7 +136,7 @@
                     <h4 class="section-title">Related episodes</h4>
                 </div>
             </div>
-            @if(Model.RelatedEpisodes != null && Model.RelatedEpisodes.Any())
+            @if (Model.RelatedEpisodes != null && Model.RelatedEpisodes.Any())
             {
                 @foreach (var episode in Model.RelatedEpisodes)
                 {
@@ -156,9 +200,100 @@
             {
                 <h4>There is no related episodes at this time</h4>
             }
-            
-            
-       
+
+
+
         </div>
     </div>
 </section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const rewindBtn = document.getElementById('rewindBtn');
+        const forwardBtn = document.getElementById('forwardBtn');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const totalTimeDisplay = document.getElementById('totalTime');
+
+        // Format time display
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Update the time display
+        audioPlayer.addEventListener('loadedmetadata', function () {
+            totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+        });
+
+        audioPlayer.addEventListener('timeupdate', function () {
+            currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+        });
+
+        // Play/Pause
+        playPauseBtn.addEventListener('click', function () {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playPauseBtn.textContent = '⏸ Pause';
+            } else {
+                audioPlayer.pause();
+                playPauseBtn.textContent = '▶️ Play';
+            }
+        });
+
+        // Rewind 15 seconds
+        rewindBtn.addEventListener('click', function () {
+            audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 15);
+        });
+
+        // Fast forward 15 seconds
+        forwardBtn.addEventListener('click', function () {
+            audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + 15);
+        });
+    });
+
+
+
+
+
+    function toggleLike(episodeId, isLiking) {
+        $.ajax({
+            url: '/EpisodeLikes/ToggleLike',
+            type: 'POST',
+            data: {
+                episodeId: episodeId,
+                isLiking: isLiking
+            },
+            success: function (response) {
+                if (response.likeCount !== undefined) {
+                    // Update the like count
+                    $('#like-count').text(response.likeCount);
+
+                    if (isLiking) {
+                        // User is liking the episode, change icon to filled heart and make button red
+                        $('#likeBtn').removeClass('btn-secondary').addClass('btn-danger')
+                            .attr('onclick', "toggleLike('" + episodeId + "', false)");
+                        $('#like-icon').removeClass('far fa-heart').addClass('fas fa-heart') // Change to filled heart
+                            .css('color', 'blue');  // Change icon color to red
+                    } else {
+                        // User is unliking the episode, change icon to outlined heart and button to gray
+                        $('#likeBtn').removeClass('btn-danger').addClass('btn-secondary')
+                            .attr('onclick', "toggleLike('" + episodeId + "', true)");
+                        $('#like-icon').removeClass('fas fa-heart').addClass('far fa-heart') // Change to outlined heart
+                            .css('color', 'white');  // Change icon color to gray
+                    }
+                }
+                else {
+                    alert("Error liking");
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('Error processing your request. Please try again later.');
+            }
+        });
+    }
+</script>

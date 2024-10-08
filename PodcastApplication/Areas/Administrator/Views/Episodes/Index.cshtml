@@ -15,30 +15,16 @@
             <th>
                 @Html.DisplayNameFor(model => model.EpisodeTitle)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EpisodeDescription)
-            </th>
+           
             <th>
                 @Html.DisplayNameFor(model => model.AudioFile)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.EpisodeDuration)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EpisodeNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Podcast)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsDeleted)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
+            
+           
+          
             <th></th>
         </tr>
     </thead>
@@ -49,29 +35,12 @@
                 @Html.DisplayFor(modelItem => item.EpisodeTitle)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EpisodeDescription)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.AudioFile)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.EpisodeDuration)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EpisodeNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Podcast.PodcastId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsDeleted)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
+            
             <td>
                 <a asp-action="Edit" asp-route-id="@item.EpisodeId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.EpisodeId">Details</a> |

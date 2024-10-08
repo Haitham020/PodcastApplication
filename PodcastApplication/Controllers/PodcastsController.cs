@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodcastApplication.Data;
+using PodcastApplication.Models;
+using PodcastApplication.Models.ViewModels;
 using System.Security.Claims;
 
 namespace PodcastApplication.Controllers
@@ -31,8 +33,12 @@ namespace PodcastApplication.Controllers
             return View(allPodcasts);
         }
         [HttpGet]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> PodcastDetails(Guid? id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
             var podcast = await db.Podcasts
                 .Include(e => e.Episodes)!
                     .ThenInclude(x => x.Comments)
@@ -42,14 +48,41 @@ namespace PodcastApplication.Controllers
                     .ThenInclude(a => a.EpisodeListeners)
                 .Include(c => c.Category)
                 .Include(u => u.Creator)
+                .Include(s => s.Subscriptions)
+                .Include(r => r.Ratings)
                 .FirstOrDefaultAsync(p => p.PodcastId == id);
 
-            if(podcast == null)
+            if (podcast == null)
             {
                 return NotFound();
             }
 
-            return View(podcast);
+            var episodes =  podcast.Episodes!
+                .Where(x => x.PodcastId == id && x.IsActive)
+                .OrderBy(x => x.CreatedAt)
+                .ToList();
+
+            int episodeNum = 1;
+            foreach (var epis in episodes)
+            {
+                epis.EpisodeNumber = episodeNum;
+                episodeNum++;
+            }
+
+            var userRating = await db.Ratings
+                .FirstOrDefaultAsync(r => r.UserId == userId && r.PodcastId == id);
+
+            int userRatingValue = userRating != null ? userRating.RatingValue : 0;
+
+
+            PodcastDetailViewModel model = new PodcastDetailViewModel
+            {
+                Podcast = podcast,
+                Episodes = episodes,
+                UserRatingValue = userRatingValue
+            };
+
+            return View(model);
         }
 
     }

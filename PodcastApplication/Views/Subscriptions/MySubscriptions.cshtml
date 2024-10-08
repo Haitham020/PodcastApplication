@@ -1,0 +1,7 @@
+﻿@model IEnumerable<Podcast>
+
+@foreach (var podcast in Model)
+{
+    <h4>@podcast.PodcastTitle</h4>
+    <p>@podcast.PodcastDescription</p>
+}

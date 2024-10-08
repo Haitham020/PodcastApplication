@@ -1,18 +1,28 @@
-﻿@model Podcast
+﻿@model PodcastDetailViewModel
+@using PodcastApplication.Data;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
 
+@inject AppDbContext _db
+
+@{
+    var userId = _userManager.GetUserId(User);
+    var isSubscribed = _db.Subscriptions.Any(s => s.PodcastId == Model.Podcast!.PodcastId && s.UserId == userId);
+
+    var ratingCount = Model.Podcast!.Ratings?.Count() ?? 0;
+    var averageRating = ratingCount > 0 ? Model.Podcast.Ratings!.Average(r => r.RatingValue).ToString("0.0") : "0";
+}
 
 @{
     ViewData["Title"] = "Podcast Details";
 }
 
 <style>
-    .audio-player {
-        width: 100%; 
-        margin-top: 15px; 
-    }
+    
 
     .custom-block {
-        padding: 15px; 
+        padding: 15px;
     }
 
     .custom-block-icon-wrap {
@@ -20,7 +30,17 @@
         width: 100%;
     }
 
+    .star {
+        cursor: pointer;
+        font-size: 24px;
+        color: gray;
+    }
+
+        .star.selected {
+            color: gold;
+        }
 </style>
+
 
 <section class="latest-podcast-section section-padding pb-0" id="section_2">
     <div class="container">
@@ -28,7 +48,7 @@
 
             <div class="col-lg-10 col-12">
                 <div class="section-title-wrap mb-5">
-                    <h4 class="section-title">@Model.PodcastTitle</h4>
+                    <h4 class="section-title">@Model.Podcast.PodcastTitle</h4>
                 </div>
 
                 <div class="row">
@@ -44,27 +64,73 @@
                         <div class="custom-block-info">
                             <div class="custom-block-top d-flex mb-1">
 
+                                @if (_signInManager.IsSignedIn(User))
+                                {
+                                    @if (isSubscribed)
+                                    {
+                                        <button id="subscribeBtn" class="btn btn-secondary" onclick="toggleSubscription('@Model.Podcast.PodcastId', false)">
+                                            Unubscribe
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button id="subscribeBtn" class="btn btn-primary" onclick="toggleSubscription('@Model.Podcast.PodcastId', true)">
+                                            Subscribe
+                                        </button>
+                                    }
+
+                                }
+                                else
+                                {
+                                    <a asp-action="Login" asp-controller="Account">
+                                        Login to access to podcasts and episodes!
+                                    </a>
+                                }
+
+
                                 <h4>
                                     @Model.Episodes!.Count() Episodes
                                 </h4>
 
+
                             </div>
+                            <h4 id="subscriptionCount">
+                                @Model.Podcast.Subscriptions!.Count() Subscriptions
+                            </h4>
+                            <h2 class="mb-2">@Model.Podcast.PodcastTitle</h2>
+                            <h2 class="mb-2">@Model.Podcast.Category!.CategoryName</h2>
 
-                            <h2 class="mb-2">@Model.PodcastTitle</h2>
-                            <h2 class="mb-2">@Model.Category!.CategoryName</h2>
-
-                            <p>@Model.PodcastDescription</p>
+                            <p>@Model.Podcast.PodcastDescription</p>
 
 
+                            <h4>@ratingCount</h4>
+                            <h3 id="averageRating">@averageRating</h3>
+
+                            @if (_signInManager.IsSignedIn(User))
+                            {
+                                <div class="rating" data-user-rating="@Model.UserRatingValue" data-podcast-id="@Model.Podcast.PodcastId">
+                                    <span class="star" data-value="1">★</span>
+                                    <span class="star" data-value="2">★</span>
+                                    <span class="star" data-value="3">★</span>
+                                    <span class="star" data-value="4">★</span>
+                                    <span class="star" data-value="5">★</span>
+                                </div>
+
+                                <button class="btn btn-primary" id="submitRating">Submit Rating</button>
+
+
+                                @Html.AntiForgeryToken()
+
+                            }
 
                             <div class="profile-block profile-detail-block d-flex flex-wrap align-items-center mt-5">
                                 <div class="d-flex mb-3 mb-lg-0 mb-md-0">
                                     <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
 
                                     <p>
-                                        @Model.Creator!.UserName
-                                        <img src="images/verified.png" class="verified-image img-fluid" alt="">
-                                        <strong>@Model.Creator.CreatorGenre</strong>
+                                        @Model.Podcast.Creator!.UserName
+                                        <img src="~/images/verified.png" class="verified-image img-fluid" alt="">
+                                        <strong>@Model.Podcast.Creator.CreatorGenre</strong>
                                     </p>
                                 </div>
 
@@ -97,131 +163,199 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-12 col-12">
-                <div class="section-title-wrap mb-5">
-                    <h4 class="section-title">@Model.PodcastTitle episodes</h4>
+                <div class="section-title-wrap mb-5 text-center">
+                    <h4 class="section-title">@Model.Podcast.PodcastTitle episodes</h4>
                 </div>
             </div>
-
-            @foreach (var episode in Model.Episodes!)
+            @if(Model.Episodes != null && Model.Episodes.Any() )
             {
-                <div class="col-lg-6 col-12 mb-4 mb-lg-0">
-                    <div class="custom-block d-flex">
-                        <div class="">
-                            <div class="custom-block-icon-wrap">
-                                <div class="section-overlay"></div>
-                                <a href="detail-page.html" class="custom-block-image-wrap">
-                                    <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
-                                </a>
+                @foreach (var episode in Model.Episodes)
+                {
+                    <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                        <div class="custom-block d-flex p-3" style="border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                            <div class="me-3">
+                                <div class="custom-block-icon-wrap">
+                                    <a href="detail-page.html" class="custom-block-image-wrap">
+                                        <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid rounded" alt="">
+                                    </a>
+                                </div>
+
+                                <div class="audio-player mt-3">
+                                    <audio controls style="width: 100%;">
+                                        <source src="~/audio/@episode.AudioFile" type="audio/mpeg">
+                                    </audio>
+                                </div>
+
+                                <div class="mt-2">
+                                    <a href="#" class="btn custom-btn btn-sm w-100">Play</a>
+                                </div>
                             </div>
 
+                            <div class="custom-block-info flex-grow-1">
+                                <div class="custom-block-top d-flex justify-content-between mb-2">
+                                    <small>
+                                        <i class="bi-clock-fill custom-icon"></i> @episode.EpisodeDuration
+                                    </small>
 
-                            <div class="audio-player mt-3">
-                                <audio controls>
-                                    <source src="~/audio/@episode.AudioFile" type="audio/mpeg">
-                                </audio>
+                                    <small class="badge bg-primary">Episode @episode.EpisodeNumber</small>
+                                </div>
+
+                                <h5 class="mb-2">
+                                    <a href="detail-page.html" class="text-dark" style="text-decoration: none;">
+                                        @episode.EpisodeTitle | @episode.Podcast!.PodcastTitle
+                                    </a>
+                                </h5>
+
+                                <p class="mb-0 text-muted">@episode.EpisodeDescription</p>
+
+                                <div class="custom-block-bottom d-flex justify-content-between align-items-center mt-3">
+                                    <a href="#" class="bi-headphones me-1 text-muted">
+                                        <span>@episode.EpisodeListeners!.Count()</span>
+                                    </a>
+
+                                    <a href="#" class="bi-heart me-1 text-muted">
+                                        <span>@episode.EpisodeLikes!.Count()</span>
+                                    </a>
+
+                                    <a href="#" class="bi-chat me-1 text-muted">
+                                        <span>@episode.Comments!.Count()</span>
+                                    </a>
+
+                                    <a href="#" class="bi-download text-muted">
+                                        <span>50k</span>
+                                    </a>
+                                </div>
                             </div>
 
-                            <div class="mt-2">
-                                <a href="#" class="btn custom-btn">Follow</a>
-                            </div>
-                        </div>
-
-                        <div class="custom-block-info">
-                            <div class="custom-block-top d-flex mb-1">
-                                <small class="me-4">
-                                    <i class="bi-clock-fill custom-icon"></i>
-                                    @episode.EpisodeDuration
-                                </small>
-
-                                <small class="badge">
-                                    Episode @episode.EpisodeNumber of <span>@episode.Podcast!.Episodes!.Count()</span>
-                                </small>
-                            </div>
-
-                            <h5 class="mb-2">
-                                <a href="detail-page.html">
-                                    @episode.EpisodeTitle  | @episode.Podcast.PodcastTitle
+                            <div class="d-flex flex-column justify-content-start ms-3">
+                                <a href="#" class="badge bg-secondary mb-2">
+                                    <i class="bi-heart text-light"></i>
                                 </a>
-                            </h5>
-
-                            <p class="mb-0">@episode.EpisodeDescription</p>
-
-                            <div class="custom-block-bottom d-flex justify-content-between mt-3">
-                                <a href="#" class="bi-headphones me-1">
-                                    <span>@episode.EpisodeListeners!.Count()</span>
-                                </a>
-
-                                <a href="#" class="bi-heart me-1">
-                                    <span>@episode.EpisodeLikes!.Count()</span>
-                                </a>
-
-                                <a href="#" class="bi-chat me-1">
-                                    <span>@episode.Comments!.Count()</span>
-                                </a>
-
-                                <a href="#" class="bi-download">
-                                    <span>50k</span>
+                                <a href="#" class="badge bg-secondary">
+                                    <i class="bi-bookmark text-light"></i>
                                 </a>
                             </div>
-                        </div>
-
-                        <div class="d-flex flex-column ms-auto">
-                            <a href="#" class="badge ms-auto">
-                                <i class="bi-heart"></i>
-                            </a>
-
-                            <a href="#" class="badge ms-auto">
-                                <i class="bi-bookmark"></i>
-                            </a>
                         </div>
                     </div>
-                </div>
+                }
             }
+            else
+            {
+                <h4>No Episodes Are Added Yet</h4>
+            }
+            
         </div>
     </div>
 </section>
 
 
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-    const audio = document.getElementById("audio");
-    const playPauseButton = document.getElementById("play-pause-button");
-    const volumeControl = document.getElementById("volume-control");
-    const progressBar = document.getElementById("progress-bar");
-    const currentTimeDisplay = document.getElementById("current-time");
-    const totalTimeDisplay = document.getElementById("total-time");
+    function toggleSubscription(podcastId, isSubscribing) {
+        $.ajax({
+            url: '/Subscriptions/ToggleSubscription',
+            type: 'POST',
+            data: {
+                podcastId: podcastId,
+                isSubscribing: isSubscribing
+            },
+            success: function (response) {
 
-    let isPlaying = false;
+                if (response.subscriptionCount !== undefined) {
+                    $('#subscriptionCount').text(response.subscriptionCount + ' Subscriptions');
 
-    playPauseButton.addEventListener("click", () => {
-        if (isPlaying) {
-            audio.pause();
-            playPauseButton.textContent = "Play";
-        } else {
-            audio.play();
-            playPauseButton.textContent = "Pause";
+
+                    if (isSubscribing) {
+                        $('#subscribeBtn').text('Unsubscribe').removeClass('btn-primary').addClass('btn-secondary')
+                            .attr('onclick', "toggleSubscription('" + podcastId + "', false)");
+                    } else {
+                        $('#subscribeBtn').text('Subscribe').removeClass('btn-secondary').addClass('btn-primary')
+                            .attr('onclick', "toggleSubscription('" + podcastId + "', true)");
+                    }
+                }
+                else {
+                    alert("Error: Subscription count is undefined.");
+                }
+
+            },
+            error: function (xhr, status, error) {
+                alert('Error processing your request. Please try again later.');
+
+            }
+        });
+    }
+
+
+
+    $(document).ready(function () {
+    let selectedRating = 0;
+    const stars = $(".star");
+    const podcastId = $(".rating").data("podcast-id");
+    const token = $('input[name="__RequestVerificationToken"]').val();
+
+
+        const savedRating = $(".rating").data("user-rating");
+
+        
+        if (savedRating) {
+            stars.each(function () {
+                if ($(this).data("value") <= savedRating) {
+                    $(this).addClass("selected");
+                    $('#submitRating').text('Re-Submit').removeClass('btn-primary').addClass('btn-secondary')
+                }
+            });
+            selectedRating = savedRating;
         }
-        isPlaying = !isPlaying;
+
+    stars.on("click", function () {
+        selectedRating = $(this).data("value");
+        
+        stars.removeClass("selected").each(function () {
+            if ($(this).data("value") <= selectedRating) {
+                $(this).addClass("selected");
+                
+
+            }
+        });
     });
 
-    volumeControl.addEventListener("input", () => {
-        audio.volume = volumeControl.value;
+   
+    $("#submitRating").on("click", function () {
+        if (selectedRating > 0) {
+            $.ajax({
+                type: "POST",
+                url: "/Ratings/SubmitRating",
+                data: {
+                    __RequestVerificationToken: token,
+                    PodcastId: podcastId,
+                    RatingValue: selectedRating
+                },
+                
+                success: function (response) {
+                    if (response.success) {
+                        $("#averageRating").text(response.averageRating);
+                        $('#submitRating').text('Re-Submit').removeClass('btn-primary').addClass('btn-secondary')
+
+                        
+                    } else {
+                        alert("There was an issue submitting your rating.");
+                    }
+                },
+                error: function () {
+                    alert("An error occurred.");
+                }
+            });
+        } else {
+            alert("Please select a rating.");
+        }
     });
+});
 
-    audio.addEventListener("timeupdate", () => {
-        const currentTime = audio.currentTime;
-        const duration = audio.duration;
 
-        const currentMinutes = Math.floor(currentTime / 60);
-        const currentSeconds = Math.floor(currentTime % 60);
-        const totalMinutes = Math.floor(duration / 60);
-        const totalSeconds = Math.floor(duration % 60);
-
-        currentTimeDisplay.textContent = `${currentMinutes}:${currentSeconds < 10 ? '0' : ''}${currentSeconds}`;
-        totalTimeDisplay.textContent = `${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
-
-        const progress = (currentTime / duration) * 100;
-        progressBar.style.width = `${progress}%`;
-    });
 </script>
 
 

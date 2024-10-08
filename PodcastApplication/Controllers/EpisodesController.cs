@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using PodcastApplication.Data;
 using PodcastApplication.Models;
@@ -21,6 +22,7 @@ namespace PodcastApplication.Controllers
                 .Include(x => x.Podcast)
                 .ThenInclude(x => x!.Creator)
                 .OrderBy(e => e.CreatedAt)
+                .Where(x => x.IsActive)
                 .ToListAsync();
 
             foreach (var podcast in episodes.GroupBy(p => p.PodcastId))
@@ -50,11 +52,23 @@ namespace PodcastApplication.Controllers
                     .ThenInclude(c => c!.Category)
                 .Include(p => p.Podcast)
                     .ThenInclude(u => u!.Creator)
+                .Include(x => x.EpisodeLikes)
                 .FirstOrDefaultAsync(m => m.EpisodeId == id);
 
             if (episode == null)
             {
                 return NotFound();
+            }
+            var podcastEpisodes = await db.Episodes
+                .Where(p => p.PodcastId == episode.PodcastId && p.IsActive)
+                .OrderBy(c => c.CreatedAt)
+                .ToListAsync();
+
+            int episodeNum = 1;
+            foreach (var epis in podcastEpisodes)
+            {
+                epis.EpisodeNumber = episodeNum;
+                episodeNum++;
             }
 
             var relatedEpisodes = await db.Episodes.Include(x => x.Comments)
@@ -68,11 +82,12 @@ namespace PodcastApplication.Controllers
                 && c.EpisodeId != episode.EpisodeId)
                 .Take(3)
                 .ToListAsync();
-           
+
             EpisodeDetailViewModel episodeDetail = new EpisodeDetailViewModel
             {
                 Episode = episode,
-                RelatedEpisodes = relatedEpisodes
+                RelatedEpisodes = relatedEpisodes,
+                EpisodeNumber = episode.EpisodeNumber
             };
 
             return View(episodeDetail);
