@@ -3,6 +3,84 @@
 }
 
 
+<div class="container-fluid py-5">
+    <div class="container py-5 text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="row pt-3 mx-0">
+                    <div class="col-3 px-0">
+                        <div class="bg-primary text-center p-4">
+                            <h1 class="text-white counter" data-target="@ViewBag.CreatorUsers">0</h1>
+                            <h6 class="text-uppercase text-white"><span class="d-block">Creators</span></h6>
+                        </div>
+                    </div>
+                    <div class="col-3 px-0">
+                        <div class="bg-dark text-center p-4">
+                            <h1 class="text-white counter" data-target="@ViewBag.ListenerUsers">0</h1>
+                            <h6 class="text-uppercase text-white"><span class="d-block">Listeners</span></h6>
+                        </div>
+                    </div>
+                    <div class="col-3 px-0">
+                        <div class="bg-info text-center p-4">
+                            <h1 class="text-white counter" data-target="@ViewBag.Podcasts">0</h1>
+                            <h6 class="text-uppercase text-white"><span class="d-block">Podcasts</span></h6>
+                        </div>
+                    </div>
+                    <div class="col-3 px-0">
+                        <div class="bg-secondary text-center p-4">
+                            <h1 class="text-white counter" data-target="@ViewBag.Episodes">0</h1>
+                            <h6 class="text-uppercase text-white"><span class="d-block">Episodes</span></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+    function animateCounter(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            element.innerText = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+
+    function startCounting() {
+        const counters = document.querySelectorAll('.counter');
+        counters.forEach(counter => {
+            const target = +counter.getAttribute('data-target');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateCounter(counter, 0, target, 2000);
+                        observer.disconnect();
+                    }
+                });
+            });
+            observer.observe(counter);
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', startCounting);
+</script>
+
+
+
+
+
+
 @await Component.InvokeAsync("Creator")
 
 @await Component.InvokeAsync("Episode")

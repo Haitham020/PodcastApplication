@@ -20,12 +20,13 @@ namespace PodcastApplication.Controllers
             var allPodcasts = await db.Podcasts.Include(u => u.Creator)
                 .Include(r => r.Ratings)
                 .Include(s => s.Subscriptions)
+                .AsNoTrackingWithIdentityResolution()
                 .ToListAsync();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var userPlaylists = db.Playlists
-                .Where(p => p.UserId == userId)
+                .Where(p => p.UserId == userId && p.IsActive)
                 .ToList();
 
             ViewBag.UserPlaylists = userPlaylists;
@@ -33,7 +34,6 @@ namespace PodcastApplication.Controllers
             return View(allPodcasts);
         }
         [HttpGet]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> PodcastDetails(Guid? id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -81,6 +81,11 @@ namespace PodcastApplication.Controllers
                 Episodes = episodes,
                 UserRatingValue = userRatingValue
             };
+            var userPlaylists = db.Playlists
+                .Where(p => p.UserId == userId && p.IsActive)
+                .ToList();
+
+            ViewBag.UserPlaylists = userPlaylists;
 
             return View(model);
         }

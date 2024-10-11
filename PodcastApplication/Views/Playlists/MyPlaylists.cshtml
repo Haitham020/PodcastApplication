@@ -29,6 +29,8 @@
                             <p class="card-text">@playlist.PlaylistDescription</p>
                             <a asp-action="SavedItemsInPlaylist" asp-controller="Playlists" asp-route-playlistId="@playlist.PlaylistId"
                             class="btn btn-primary">View Playlist</a>
+                            <a asp-action="Delete" asp-controller="Playlists" asp-route-id="@playlist.PlaylistId"
+                            class="btn btn-primary">Delete Playlist</a>
                         </div>
                     </div>
                 </div>

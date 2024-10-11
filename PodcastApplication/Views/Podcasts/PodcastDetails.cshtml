@@ -19,7 +19,11 @@
 }
 
 <style>
-    
+    .modal-backdrop {
+        position: relative;
+        z-index: -1
+    }
+
 
     .custom-block {
         padding: 15px;
@@ -123,6 +127,44 @@
 
                             }
 
+                            <div class="modal fade" id="playlistModal-@Model.Podcast.PodcastId" aria-labelledby="playlistModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="playlistModalLabel">Add to Playlist</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Select playlists to add <strong>@Model.Podcast.PodcastTitle</strong>:</p>
+                                            <form id="playlistForm-@Model.Podcast.PodcastId" method="post" asp-action="AddToPlaylists" asp-controller="Playlists">
+                                                <input type="hidden" name="podcastId" value="@Model.Podcast.PodcastId" />
+                                                @foreach (var playlist in ViewBag.UserPlaylists)
+                                                {
+                                                    <div class="form-check playlist-item">
+                                                        <input class="form-check-input" type="checkbox" id="playlist-@playlist.PlaylistId" name="playlistIds" value="@playlist.PlaylistId">
+                                                        <label class="form-check-label" for="playlist-@playlist.PlaylistId">
+                                                            @playlist.PlaylistName
+                                                        </label>
+                                                    </div>
+                                                }
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="button" class="btn btn-primary" onclick="submitPlaylists('@Model.Podcast.PodcastId')">Add to Playlist</button>
+                                                </div>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="social-icon ms-lg-auto ms-md-auto">
+
+                                <a href="#" class="bi-plus-circle fs-2" data-bs-toggle="modal" data-bs-target="#playlistModal-@Model.Podcast.PodcastId">
+
+                                </a>
+
+                            </div>
+
                             <div class="profile-block profile-detail-block d-flex flex-wrap align-items-center mt-5">
                                 <div class="d-flex mb-3 mb-lg-0 mb-md-0">
                                     <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
@@ -167,7 +209,7 @@
                     <h4 class="section-title">@Model.Podcast.PodcastTitle episodes</h4>
                 </div>
             </div>
-            @if(Model.Episodes != null && Model.Episodes.Any() )
+            @if (Model.Episodes != null && Model.Episodes.Any())
             {
                 @foreach (var episode in Model.Episodes)
                 {
@@ -201,8 +243,9 @@
                                 </div>
 
                                 <h5 class="mb-2">
-                                    <a href="detail-page.html" class="text-dark" style="text-decoration: none;">
-                                        @episode.EpisodeTitle | @episode.Podcast!.PodcastTitle
+                                    <a asp-action="EpisodeDetails" asp-controller="Episodes"
+                                       asp-route-id="@episode.EpisodeId">
+                                        @episode.EpisodeTitle
                                     </a>
                                 </h5>
 
@@ -243,7 +286,7 @@
             {
                 <h4>No Episodes Are Added Yet</h4>
             }
-            
+
         </div>
     </div>
 </section>
@@ -292,15 +335,15 @@
 
 
     $(document).ready(function () {
-    let selectedRating = 0;
-    const stars = $(".star");
-    const podcastId = $(".rating").data("podcast-id");
-    const token = $('input[name="__RequestVerificationToken"]').val();
+        let selectedRating = 0;
+        const stars = $(".star");
+        const podcastId = $(".rating").data("podcast-id");
+        const token = $('input[name="__RequestVerificationToken"]').val();
 
 
         const savedRating = $(".rating").data("user-rating");
 
-        
+
         if (savedRating) {
             stars.each(function () {
                 if ($(this).data("value") <= savedRating) {
@@ -311,49 +354,83 @@
             selectedRating = savedRating;
         }
 
-    stars.on("click", function () {
-        selectedRating = $(this).data("value");
-        
-        stars.removeClass("selected").each(function () {
-            if ($(this).data("value") <= selectedRating) {
-                $(this).addClass("selected");
-                
+        stars.on("click", function () {
+            selectedRating = $(this).data("value");
 
+            stars.removeClass("selected").each(function () {
+                if ($(this).data("value") <= selectedRating) {
+                    $(this).addClass("selected");
+
+
+                }
+            });
+        });
+
+
+        $("#submitRating").on("click", function () {
+            if (selectedRating > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Ratings/SubmitRating",
+                    data: {
+                        __RequestVerificationToken: token,
+                        PodcastId: podcastId,
+                        RatingValue: selectedRating
+                    },
+
+                    success: function (response) {
+                        if (response.success) {
+                            $("#averageRating").text(response.averageRating);
+                            $('#submitRating').text('Re-Submit').removeClass('btn-primary').addClass('btn-secondary')
+
+
+                        } else {
+                            alert("There was an issue submitting your rating.");
+                        }
+                    },
+                    error: function () {
+                        alert("An error occurred.");
+                    }
+                });
+            } else {
+                alert("Please select a rating.");
             }
         });
     });
 
-   
-    $("#submitRating").on("click", function () {
-        if (selectedRating > 0) {
-            $.ajax({
-                type: "POST",
-                url: "/Ratings/SubmitRating",
-                data: {
-                    __RequestVerificationToken: token,
-                    PodcastId: podcastId,
-                    RatingValue: selectedRating
-                },
-                
-                success: function (response) {
-                    if (response.success) {
-                        $("#averageRating").text(response.averageRating);
-                        $('#submitRating').text('Re-Submit').removeClass('btn-primary').addClass('btn-secondary')
 
-                        
-                    } else {
-                        alert("There was an issue submitting your rating.");
-                    }
-                },
-                error: function () {
-                    alert("An error occurred.");
-                }
-            });
-        } else {
-            alert("Please select a rating.");
+
+    function submitPlaylists(podcastId) {
+        var form = document.getElementById('playlistForm-' + podcastId);
+
+
+        var checkboxes = form.querySelectorAll('input[name="playlistIds"]:checked');
+        if (checkboxes.length === 0) {
+            alert("No playlist(s) was selected");
+            return;
         }
-    });
-});
+
+        var formData = new FormData(form);
+
+
+        fetch('/Playlists/AddToPlaylists', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Podcast added to playlist(s) successfully!');
+
+                    $('#playlistModal-' + podcastId).modal('hide');
+
+                }
+                else {
+                    alert("Already Exists In Selected Playlist(s)")
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
 
 
 </script>

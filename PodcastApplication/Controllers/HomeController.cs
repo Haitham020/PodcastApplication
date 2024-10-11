@@ -11,17 +11,37 @@ namespace PodcastApplication.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private AppDbContext _db;
+        private UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, AppDbContext db)
+        public HomeController(ILogger<HomeController> logger, AppDbContext db,
+            UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _db = db;
+            _userManager = userManager;
 
 
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var users = await _userManager.Users.ToListAsync();
+            if(users == null)
+            {
+                return Content("No Users");
+            }
+            ViewBag.CreatorUsers = users.Count(user =>
+            _userManager.IsInRoleAsync(user, "Creator").Result);
+            
+            ViewBag.ListenerUsers = users.Count(user =>
+            _userManager.IsInRoleAsync(user, "Listener").Result);
+
+            var Podcasts = _db.Podcasts.Count();
+            var Episodes = _db.Episodes.Count();
+            
+            ViewBag.Podcasts = Podcasts;
+            ViewBag.Episodes = Episodes;
+            
             return View();
         }
         public async Task<IActionResult> About()

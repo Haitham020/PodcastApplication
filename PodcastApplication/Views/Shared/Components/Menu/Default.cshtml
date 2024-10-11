@@ -7,7 +7,7 @@
 
 <nav class="navbar navbar-expand-lg">
     <div class="container">
-        <a class="navbar-brand me-lg-5 me-0" href="index.html">
+        <a class="navbar-brand me-lg-5 me-0" href=@Url.Action("Index", "Home")>
             <img src="~/images/pod-talk-logo.png" class="logo-image img-fluid" alt="templatemo pod talk">
         </a>
         @if ((ViewContext.RouteData.Values["Controller"]?.ToString() == "Account" &&
@@ -77,30 +77,68 @@
                 <div class="ms-4">
                     @if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                     {
-                        <form method="post">
-                            <button type="submit" asp-action="Logout" asp-controller="Account" class="btn btn-primary py-2 px-4 d-none d-lg-block">Logout @User.Identity!.Name</button>
-                            <a type="submit" asp-area="Administrator" asp-action="Index" asp-controller="ControlPanel" class="btn btn-primary py-2 px-4 d-none d-lg-block">Dashboard</a>
+                        <ul class="navbar-nav ms-lg-auto">
+                           
+                            <li class="nav-item">
+                                <form id="logoutForm" method="post" asp-action="Logout" asp-controller="Account" class="d-inline">
+                                    <a href="#" onclick="document.getElementById('logoutForm').submit();" class="nav-link">
+                                        <i class="bi bi-box-arrow-right fs-3"></i> Logout @User.Identity!.Name
+                                    </a>
+                                </form>
+                            </li>
 
-                        </form>
+                            
+                            <li class="nav-item">
+                                <a asp-area="Administrator" asp-action="Index" asp-controller="ControlPanel" class="nav-link">
+                                    Dashboard
+                                </a>
+                            </li>
+                        </ul>
                     }
-                    else if(_signInManager.IsSignedIn(User) && User.IsInRole("Creator"))
+                    else if (_signInManager.IsSignedIn(User) && User.IsInRole("Creator"))
                     {
-                        <form method="post">
-                            <button type="submit" asp-action="Logout" asp-controller="Account" class="btn btn-primary py-2 px-4 d-none d-lg-block">Logout @User.Identity!.Name</button>
-                            <a type="submit" asp-action="CreatorProfile" asp-controller="Creators" class="btn btn-primary py-2 px-4 d-none d-lg-block">Profile</a>
-                        </form>
+                        <ul class="navbar-nav ms-lg-auto">
+                           
+                            <li class="nav-item">
+                                <form id="logoutForm" method="post" asp-action="Logout" asp-controller="Account" class="d-inline">
+                                    <a href="#" onclick="document.getElementById('logoutForm').submit();" class="nav-link">
+                                        <i class="bi bi-box-arrow-right fs-3"></i> Logout @User.Identity!.Name
+                                    </a>
+                                </form>
+                            </li>
+
+                           
+                            <li class="nav-item">
+                                <a asp-action="CreatorProfile" asp-controller="Creators" class="nav-link">
+                                    <i class="bi bi-person-circle fs-3"></i>
+                                </a>
+                            </li>
+                        </ul>
                     }
                     else if (_signInManager.IsSignedIn(User) && User.IsInRole("Listener"))
                     {
-                        <form method="post">
-                            <button type="submit" asp-action="Logout" asp-controller="Account" class="btn btn-primary py-2 px-4 d-none d-lg-block">Logout @User.Identity!.Name</button>
-                            <a type="submit" asp-action="ListenerProfile" asp-controller="Listeners" class="btn btn-primary py-2 px-4 d-none d-lg-block">Profile</a>
-                        </form>
+                        <ul class="navbar-nav ms-lg-auto">
+                            <li class="nav-item">
+                                <form id="logoutForm" method="post" asp-action="Logout" asp-controller="Account" class="d-inline">
+                                    <a href="#" onclick="document.getElementById('logoutForm').submit();" class="nav-link">
+                                        <i class="bi bi-box-arrow-right fs-3"></i> Logout @User.Identity!.Name
+                                    </a>
+                                </form>
+                            </li>
+
+                           
+                            <li class="nav-item">
+                                <a asp-action="ListenerProfile" asp-controller="Listeners" class="nav-link">
+                                    <i class="bi bi-person-circle fs-3"></i>
+                                </a>
+                            </li>
+                        </ul>
                     }
                     else
                     {
                         <a asp-action="Register" asp-controller="Account" class="btn custom-btn custom-border-btn smoothscroll">Get started</a>
                     }
+
                 </div>
             }
 

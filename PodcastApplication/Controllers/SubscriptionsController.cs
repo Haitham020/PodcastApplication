@@ -76,8 +76,9 @@ namespace PodcastApplication.Controllers
 
             var mySubs = await _db.Subscriptions
                 .Where(x => x.UserId == userId)
-                .Include(p => p.Podcast)      
-                .Select(p => p.Podcast)
+                .Include(p => p.Podcast)
+                .ThenInclude(x => x!.Creator)
+                .Select(x => x.Podcast)
                 .ToListAsync();
 
             return View(mySubs);

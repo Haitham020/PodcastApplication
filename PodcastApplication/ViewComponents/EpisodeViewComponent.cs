@@ -15,11 +15,14 @@ namespace PodcastApplication.ViewComponents
         public async Task<IViewComponentResult> InvokeAsync()
         {
             var episodes = await db.Episodes
+                .Include(f => f.Favorites)
                 .Include(c => c.Comments)
                 .Include(i => i.EpisodeLikes)
+                .Include(x => x.EpisodeListeners)
                 .Include(x => x.Podcast)
                 .ThenInclude(x => x!.Creator)
                 .OrderBy(e => e.CreatedAt)
+                .Where(e => e.IsActive)
                 .ToListAsync();
 
             foreach(var podcast in episodes.GroupBy(p => p.PodcastId))

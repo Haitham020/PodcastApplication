@@ -42,6 +42,9 @@
 
         @await Component.InvokeAsync("Menu")
 
+        
+
+
         @if ((ViewContext.RouteData.Values["Controller"]?.ToString() == "Account" &&
         ViewContext.RouteData.Values["Action"]?.ToString() == "Register"))
         {
@@ -112,6 +115,7 @@
                 </div>
             </section>
         }
+        
 
 
         <div class="container">
@@ -206,7 +210,7 @@
 
                 <div class="col-lg-3 col-12">
                     <p class="copyright-text mb-0">
-                        Copyright © 2036 Talk Pod Company
+                         © 2024 PodTalk
                         <br><br>
                         Design: <a rel="nofollow" href="https://templatemo.com/page/1" target="_parent">TemplateMo</a>
                     </p>
@@ -216,7 +220,26 @@
     </footer>
 
     <!-- JAVASCRIPT FILES -->
+   @*  <script type="text/javascript">
 
+        document.getElementById('btnSwitch').addEventListener('click', () => {
+        let currentTheme = document.documentElement.getAttribute('data-bs-theme');
+        if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        } else {
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        }
+     });
+
+// On page load, check for saved theme preference
+window.onload = () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';  // Default to light
+    document.documentElement.setAttribute('data-bs-theme', savedTheme);
+};
+
+    </script> *@
 
     <script src="~/js/jquery.min.js"></script>
     <script src="~/js/bootstrap.bundle.min.js"></script>

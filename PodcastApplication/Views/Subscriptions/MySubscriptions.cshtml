@@ -1,7 +1,57 @@
 ﻿@model IEnumerable<Podcast>
 
-@foreach (var podcast in Model)
-{
-    <h4>@podcast.PodcastTitle</h4>
-    <p>@podcast.PodcastDescription</p>
-}
+<section class="trending-podcast-section section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">Subscribed Podcasts</h4>
+                </div>
+            </div>
+            @if(Model.Any() && Model != null)
+            {
+                @foreach (var podcast in Model)
+                {
+                  
+
+                    <div class="col-lg-4 col-12 mb-4">
+                        <div class="custom-block custom-block-full mb-4">
+                            <div class="custom-block-image-wrap">
+                                <a href="detail-page.html">
+                                    <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
+                                </a>
+                            </div>
+
+                            <div class="custom-block-info">
+                                <h5 class="mb-2">
+                                    <a asp-action="PodcastDetails" asp-controller="Podcasts"
+                                       asp-route-id="@podcast.PodcastId">
+                                        @podcast.PodcastTitle
+                                    </a>
+                                </h5>
+
+                                <div class="profile-block d-flex">
+                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <p>
+                                        @podcast.Creator!.UserName
+                                        <strong>@podcast.Creator.CreatorGenre</strong>
+                                    </p>
+                                </div>
+
+                                <p class="mb-0">@podcast.PodcastDescription</p>
+
+                               
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            }
+            else
+            {
+                <h4>No subscribed podcasts yet</h4>
+            }
+            
+        </div>
+    </div>
+</section>

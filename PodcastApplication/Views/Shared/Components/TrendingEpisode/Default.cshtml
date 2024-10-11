@@ -1,5 +1,12 @@
 ﻿@model IEnumerable<Episode>
 
+@using PodcastApplication.Data;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
+@inject AppDbContext _db
+
+
 
 <section class="trending-podcast-section section-padding">
     <div class="container">
@@ -10,68 +17,66 @@
                     <h4 class="section-title">Trending episodes</h4>
                 </div>
             </div>
-
-            @foreach(var trending in Model)
+            @if(Model.Any() && Model != null)
             {
-                <div class="col-lg-4 col-12 mb-4 mb-lg-0">
-                    <div class="custom-block custom-block-full">
-                        <div class="custom-block-image-wrap">
-                            <a href="detail-page.html">
-                                <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
-                            </a>
-                        </div>
+                @foreach (var trending in Model)
+                {
+                   
 
-                        <div class="custom-block-info">
-                            <h5 class="mb-2">
-                                <a href="detail-page.html">
-                                    @trending.EpisodeTitle
-                                    
-                                </a>
-                            </h5>
-                            <h5>@trending.Podcast!.PodcastTitle</h5>
-
-                            <div class="profile-block d-flex">
-                                <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
-
-                                <p>
-                                    @trending.Podcast.Creator!.UserName
-                                    <strong>@trending.Podcast.Creator.CreatorGenre</strong>
-                                </p>
-                            </div>
-
-                            <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-
-                            <div class="custom-block-bottom d-flex justify-content-between mt-3">
-                                <a href="#" class="bi-headphones me-1">
-                                    <span>100k</span>
-                                </a>
-
-                                <a href="#" class="bi-heart me-1">
-                                    <span>@trending.EpisodeLikes!.Count()</span>
-                                </a>
-
-                                <a href="#" class="bi-chat me-1">
-                                    <span>@trending.Comments!.Count()</span>
+                    <div class="col-lg-4 col-12 mb-4 mb-lg-0">
+                        <div class="custom-block custom-block-full">
+                            <div class="custom-block-image-wrap">
+                                <a asp-action="EpisodeDetails" asp-controller="Episodes"
+                                   asp-route-id="@trending!.EpisodeId">
+                                    <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
                                 </a>
                             </div>
-                        </div>
 
-                        <div class="social-share d-flex flex-column ms-auto">
-                            <a href="#" class="badge ms-auto">
-                                <i class="bi-heart"></i>
-                            </a>
+                            <div class="custom-block-info">
+                                <h5 class="mb-2">
+                                    <a asp-action="EpisodeDetails" asp-controller="Episodes"
+                                       asp-route-id="@trending.EpisodeId">
+                                        @trending.EpisodeTitle
 
-                            <a href="#" class="badge ms-auto">
-                                <i class="bi-bookmark"></i>
-                            </a>
+                                    </a>
+                                </h5>
+                
+
+                                <div class="profile-block d-flex">
+                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+
+                                    <p>
+                                        @trending.Podcast!.Creator!.UserName
+                                        <strong>@trending.Podcast.Creator.CreatorGenre</strong>
+                                    </p>
+                                </div>
+
+                                <p class="mb-0">@trending.EpisodeDescription</p>
+
+                                <div class="custom-block-bottom d-flex justify-content-between mt-3">
+                                    <a href="#" class="bi-headphones me-1">
+                                        <span>@(trending.EpisodeListeners?.Count() ?? 0)</span>
+                                    </a>
+
+                                    <a id="like-count-@trending.EpisodeId" class="bi-heart me-1">
+                                        <span>@(trending.EpisodeLikes?.Count() ?? 0)</span>
+                                    </a>
+
+                                    <a href="#" class="bi-chat me-1">
+                                        <span>@(trending.Comments?.Count() ?? 0)</span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             }
-
+            else
+            {
+                <h4>No Trending Episodes Yet</h4>
+            }
             
-
-           
         </div>
     </div>
 </section>
+

@@ -8,6 +8,9 @@
 @{
     var userId = _userManager.GetUserId(User);
     var isLiked = _db.EpisodeLikes.FirstOrDefault(x => x.UserId == userId && x.EpisodeId == Model.Episode!.EpisodeId);
+
+    var favoriteExist = _db.Favorites.FirstOrDefault(x => x.UserId == userId && x.EpisodeId == Model.Episode!.EpisodeId);
+
 }
 
 
@@ -85,16 +88,33 @@
                                     if (isLiked != null)
                                     {
                                         <button id="likeBtn" class="btn btn-secondary" onclick="toggleLike('@Model.Episode!.EpisodeId', false)">
-                                            <i id="like-icon" class="fas fa-heart" style="color: red;"></i> <!-- Filled heart for liked -->
+                                            <i id="like-icon" class="fas fa-heart" style="color: red;"></i>
                                         </button>
                                     }
                                     else
                                     {
                                         <button id="likeBtn" class="btn btn-secondary" onclick="toggleLike('@Model.Episode!.EpisodeId', true)">
-                                            <i id="like-icon" class="far fa-heart" style="color: white;"></i> <!-- Outlined heart for unliked -->
+                                            <i id="like-icon" class="far fa-heart" style="color: white;"></i>
                                         </button>
                                     }
                                 }
+                                @if(_signInManager.IsSignedIn(User))
+                                {
+                                    if(favoriteExist != null)
+                                    {
+                                        <button id="favBtn" href="#" class="badge ms-auto" onclick="toggleFavorite('@Model.Episode.EpisodeId', false)">
+                                            <i class="bi-bookmark-fill fs-2"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button id="favBtn" href="#" class="badge ms-auto" onclick="toggleFavorite('@Model.Episode.EpisodeId', true)">
+                                            <i class="bi-bookmark fs-2"></i>
+                                        </button>
+                                    }
+                                }
+                                
+                                
                             </div>
 
                             <div class="profile-block profile-detail-block d-flex flex-wrap align-items-center mt-5">
@@ -259,6 +279,7 @@
 
 
 
+    //Toggle Likes:
 
     function toggleLike(episodeId, isLiking) {
         $.ajax({
@@ -270,21 +291,21 @@
             },
             success: function (response) {
                 if (response.likeCount !== undefined) {
-                    // Update the like count
+                    
                     $('#like-count').text(response.likeCount);
 
                     if (isLiking) {
-                        // User is liking the episode, change icon to filled heart and make button red
+                       
                         $('#likeBtn').removeClass('btn-secondary').addClass('btn-danger')
                             .attr('onclick', "toggleLike('" + episodeId + "', false)");
-                        $('#like-icon').removeClass('far fa-heart').addClass('fas fa-heart') // Change to filled heart
-                            .css('color', 'blue');  // Change icon color to red
+                        $('#like-icon').removeClass('far fa-heart').addClass('fas fa-heart') 
+                            .css('color', 'blue');  
                     } else {
-                        // User is unliking the episode, change icon to outlined heart and button to gray
+                        
                         $('#likeBtn').removeClass('btn-danger').addClass('btn-secondary')
                             .attr('onclick', "toggleLike('" + episodeId + "', true)");
-                        $('#like-icon').removeClass('fas fa-heart').addClass('far fa-heart') // Change to outlined heart
-                            .css('color', 'white');  // Change icon color to gray
+                        $('#like-icon').removeClass('fas fa-heart').addClass('far fa-heart') 
+                            .css('color', 'white');  
                     }
                 }
                 else {
@@ -296,4 +317,33 @@
             }
         });
     }
+
+
+
+    //Toggle Favorites:
+    function toggleFavorite(episodeId, addingFavorite) {
+        $.ajax({
+            url: '/Favorites/ToggleFavorite',
+            type: 'POST',
+            data: {
+                episodeId: episodeId,
+                addingFavorite: addingFavorite
+            },
+            success: function (response) {
+                if (addingFavorite) {
+                    $('#favBtn').attr('onclick', `toggleFavorite('${episodeId}', false)`)
+                        .find('i').removeClass('bi-bookmark').addClass('bi-bookmark-fill');
+                }
+                else {
+                    $('#favBtn').attr('onclick', `toggleFavorite('${episodeId}', true)`)
+                        .find('i').removeClass('bi-bookmark-fill').addClass('bi-bookmark');
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('Error processing your request. Please try again later.');
+            }
+        });
+    }
+
+
 </script>

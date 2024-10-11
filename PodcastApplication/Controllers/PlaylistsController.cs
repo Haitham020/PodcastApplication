@@ -35,7 +35,7 @@ namespace PodcastApplication.Controllers
             }
 
             var playlists = await _context.Playlists
-                .Where(p => p.UserId == userId)
+                .Where(p => p.UserId == userId && p.IsActive)
                 .ToListAsync();
 
             return View(playlists);
@@ -178,7 +178,7 @@ namespace PodcastApplication.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(MyPlaylists));
         }
 
         private bool PlaylistExists(int id)
@@ -201,8 +201,6 @@ namespace PodcastApplication.Controllers
                 return Json(new { success = false, message = "No playlists selected." });
             }
 
-            var duplicateMessages = new List<string>();
-
             foreach (var playlistId in playlistIds)
             {
                 var exists = _context.PlaylistItems
@@ -210,7 +208,6 @@ namespace PodcastApplication.Controllers
 
                 if (exists)
                 {
-       
                     var playlistName = _context.Playlists
                         .Where(p => p.PlaylistId == playlistId)
                         .Select(p => p.PlaylistName)
@@ -218,7 +215,7 @@ namespace PodcastApplication.Controllers
 
                     if (!string.IsNullOrEmpty(playlistName))
                     {
-                        
+
                         return Json(new { success = false });
                     }
                     continue;
@@ -239,28 +236,71 @@ namespace PodcastApplication.Controllers
             return Json(new { success = true });
         }
 
-        [HttpGet]
+        [HttpGet("/Playlists/SavedItemsInPlaylist/{playlistId}")]
         public async Task<IActionResult> SavedItemsInPlaylist(int playlistId)
         {
-            
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
             {
                 return NotFound();
             }
+
             var playlist = await _context.Playlists
-                 .Include(p => p.PlaylistItems!)
+                 .Include(p => p.PlaylistItems!.Where(x => x.IsActive))
                  .ThenInclude(pi => pi.Podcast)
                  .FirstOrDefaultAsync(p => p.PlaylistId == playlistId && p.UserId == userId);
 
             if (playlist == null)
             {
-                Debug.WriteLine($"Playlist with ID {playlistId} not found for user {userId}.");
                 return NotFound("playlist is null!");
             }
 
             return View(playlist);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> DeletePlaylistItem(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var playlistItem = await _context.PlaylistItems
+                .Include(p => p.Podcast)
+                .FirstOrDefaultAsync(m => m.PlaylistItemId == id);
+
+            if (playlistItem == null)
+            {
+                return NotFound();
+            }
+
+            return View(playlistItem);
+
+
+        }
+
+
+        [HttpPost, ActionName("DeletePlaylistItem")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmDeleteItem(int id)
+        {
+            var playlistItem = await _context.PlaylistItems.FindAsync(id);
+            if (playlistItem != null)
+            {
+                playlistItem.IsActive = false;
+                playlistItem.IsDeleted = true;
+            }
+
+            await _context.SaveChangesAsync();
+
+            int playlistId = playlistItem!.PlaylistId;
+
+            return RedirectToAction("SavedItemsInPlaylist", "Playlists", new { playlistId });
+        }
+
+
 
     }
 }

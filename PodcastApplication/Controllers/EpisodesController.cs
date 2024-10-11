@@ -23,6 +23,7 @@ namespace PodcastApplication.Controllers
                 .ThenInclude(x => x!.Creator)
                 .OrderBy(e => e.CreatedAt)
                 .Where(x => x.IsActive)
+                .AsNoTrackingWithIdentityResolution()
                 .ToListAsync();
 
             foreach (var podcast in episodes.GroupBy(p => p.PodcastId))

@@ -20,7 +20,8 @@
 
                         <div class="custom-block-info custom-block-overlay-info">
                             <h5 class="mb-1">
-                                <a href="listing-page.html">
+                                <a asp-action="CategoryPodcasts" asp-controller="Categories"
+                                asp-route-id="@category.Category.CategoryId">
                                     @category.Category.CategoryName
                                 </a>
                             </h5>

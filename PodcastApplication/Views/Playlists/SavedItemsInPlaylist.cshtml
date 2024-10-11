@@ -4,11 +4,6 @@
 @{
     ViewData["Title"] = "Playlist's Items";
 }
-@if (Model == null)
-{
-    <h2>Error: Playlist is null!</h2>
-    return;
-}
 
 
 <section class="trending-podcast-section section-padding">
@@ -49,7 +44,9 @@
 
                                 <p class="mb-0">@podcast.Podcast.PodcastDescription</p>
 
-                                
+                                <a asp-action="DeletePlaylistItem" asp-controller="Playlists" asp-route-id="@podcast.PlaylistItemId">
+                                    Delete from playlist
+                                </a>
 
                                     
                                     
