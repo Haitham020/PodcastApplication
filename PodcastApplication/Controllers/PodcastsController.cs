@@ -21,6 +21,7 @@ namespace PodcastApplication.Controllers
                 .Include(r => r.Ratings)
                 .Include(s => s.Subscriptions)
                 .AsNoTrackingWithIdentityResolution()
+                .Where(p => p.IsActive)
                 .ToListAsync();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -34,7 +35,7 @@ namespace PodcastApplication.Controllers
             return View(allPodcasts);
         }
         [HttpGet]
-        public async Task<IActionResult> PodcastDetails(Guid? id)
+        public async Task<IActionResult> PodcastDetails(Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 

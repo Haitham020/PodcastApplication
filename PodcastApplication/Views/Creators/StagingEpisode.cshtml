@@ -1,0 +1,130 @@
+﻿@model EpisodeDetailViewModel
+
+
+
+@{
+    ViewData["Title"] = "Publishing Episode";
+}
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
+
+<section class="latest-podcast-section section-padding pb-0" id="section_2">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">@Model.Episode!.EpisodeTitle</h4>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-12">
+                        <div class="custom-block-icon-wrap">
+                            <div class="custom-block-image-wrap custom-block-image-detail-page">
+                                <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-9 col-12">
+                        <div class="custom-block-info">
+                            <div class="custom-block-top d-flex mb-1">
+                                <small class="me-4">
+                                    <button id="playPauseBtn" class="btn btn-primary"><i class="bi-play"></i> Play now</button>
+                                </small>
+                                <small>
+                                    <i class="bi-clock-fill custom-icon"></i> @Model.Episode.EpisodeDuration
+                                </small>
+                                <small class="ms-auto">
+                                    Episode <span class="badge">
+                                        @Model.EpisodeNumber
+                                    </span>
+                                </small>
+                                <small class="ms-auto">Likes <span id="like-count" class="badge">@Model.Episode.EpisodeLikes!.Count()</span></small>
+                            </div>
+                            <h2 class="mb-2">@Model.Episode.EpisodeTitle</h2>
+                            <h2 class="mb-2">@Model.Episode.Podcast!.PodcastTitle</h2>
+                            <p>@Model.Episode.EpisodeDescription</p>
+
+                            <div class="audio-player">
+                                <audio id="audioPlayer" src="~/audio/@Model.Episode.AudioFile" preload="metadata" controls></audio>
+                                <div class="audio-controls">
+                                    <button class="btn" id="rewindBtn">⏪ 15s</button>
+
+                                    <button class="btn" id="forwardBtn">⏩ 15s</button>
+                                    <span id="currentTime">00:00</span> / <span id="totalTime">00:00</span>
+                                </div>
+                            </div>
+                            <div>
+                                <form asp-action="TogglePublishEpisode" asp-controller="Creators" method="post" id="publishForm">
+                                    <input type="hidden" name="id" value="@Model.Episode.EpisodeId" />
+                                    @if (Model.Episode.IsActive)
+                                    {
+                                        <button type="button" id="toggleButton" class="btn btn-secondary" onclick="togglePublish()">UnPublish</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" id="toggleButton" class="btn btn-success" onclick="togglePublish()">Publish</button>
+                                    }
+
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function togglePublish() {
+        var isActive = $('#toggleButton').hasClass('btn-success'); 
+
+        Swal.fire({
+            title: isActive ? 'Publish Episode?' : 'Unpublish Episode?',
+            text: isActive ? "Do you want to publish this Episode?" : "Do you want to unpublish this Episode?",
+            icon: isActive ? 'success' : 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: isActive ? 'Yes, publish it!' : 'Yes, unpublish it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '@Url.Action("TogglePublishEpisode", "Creators")',
+                    data: $('#publishForm').serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            
+                            if (isActive) {
+                                $('#toggleButton').text('UnPublish').removeClass('btn-success').addClass('btn-secondary');
+                                Swal.fire('Published!', response.message, 'success');
+                            } else {
+                                $('#toggleButton').text('Publish').removeClass('btn-secondary').addClass('btn-success');
+                                Swal.fire('Unpublished!', response.message, 'success');
+                            }
+                        } else {
+                            Swal.fire('Error!', response.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error!', 'An error occurred while updating the publish status.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+
+
+
+
+</script>

@@ -175,6 +175,7 @@ namespace PodcastApplication.Controllers
             {
                 playlist.IsActive = false;
                 playlist.IsDeleted = true;
+                playlist.IsPublic = false;
             }
 
             await _context.SaveChangesAsync();
@@ -300,7 +301,37 @@ namespace PodcastApplication.Controllers
             return RedirectToAction("SavedItemsInPlaylist", "Playlists", new { playlistId });
         }
 
+        public async Task<IActionResult> PublicPlaylists()
+        {
+            var publicPlaylists = await _context.Playlists
+                .Include(x => x.User)
+                .Where(x => x.IsPublic)
+                .ToListAsync();
 
+            if(publicPlaylists == null)
+            {
+                return Content("PLaylist no longer exists");
+            }
+            return View(publicPlaylists);       
+        }
+
+        public async Task<IActionResult> SavedPublicPlaylists()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var savedPlaylists = await _context.SavedPlaylists
+                .Include(x => x.User)
+                .Include(p => p.Playlist)
+                .ThenInclude(u => u!.User)
+                .Where(x => x.UserId == userId && x.Playlist!.IsPublic)
+                .Select(x => x.Playlist)
+                .ToListAsync();
+
+            return View(savedPlaylists);
+        }
 
     }
 }

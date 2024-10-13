@@ -18,5 +18,6 @@ namespace PodcastApplication.Models
         public ApplicationUser? User { get; set; }
         
         public ICollection<PlaylistItem>? PlaylistItems { get; set; }
+        public ICollection<SavedPlaylist>? SavedPlaylists { get; set; }
     }
 }

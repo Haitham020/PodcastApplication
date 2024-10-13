@@ -1,0 +1,180 @@
+﻿@model IEnumerable<Playlist>
+
+@using PodcastApplication.Data;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
+@inject AppDbContext _db
+
+@{
+    ViewData["Title"] = "Public Playlists";
+}
+
+<section class="public-playlists-section py-5">
+    <div class="container">
+        <div class="section-title-wrap mb-5 text-center">
+            <h2 class="section-title">Public Playlists</h2>
+            <p class="section-description">Explore the top public playlists curated by users. Click on a playlist to view its saved items.</p>
+        </div>
+
+        @if (Model.Any() && Model != null)
+        {
+            <div class="row">
+                @foreach (var playlist in Model)
+                {
+                    var userId = _userManager.GetUserId(User);
+
+                    var savePlaylistExists = _db.SavedPlaylists.FirstOrDefault(x => x.PlaylistId == playlist.PlaylistId && x.UserId == userId);
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="playlist-card shadow-sm">
+                            <div class="playlist-img-wrap">
+                                <img src="@playlist.PlaylistImg" class="playlist-img img-fluid rounded" alt="Playlist Image">
+                            </div>
+                            <div class="playlist-content p-3">
+                                <h3 class="playlist-name mb-2">@playlist.PlaylistName</h3>
+                                <p class="playlist-creator text-muted">by @playlist.User!.UserName</p>
+
+                                <a asp-action="SavedItemsInPlaylist" asp-controller="Playlists"
+                                   asp-route-playlistId="@playlist.PlaylistId"
+                                   class="btn btn-primary btn-sm mt-3 w-100">
+                                    Go to Playlist
+                                </a>
+                            </div>
+
+                            <div class="d-flex flex-column ms-auto">
+
+                                @if (savePlaylistExists != null)
+                                {
+                                    <a id="favBtn-@playlist.PlaylistId" class="badge ms-auto" onclick="toggleSavePLaylist('@playlist.PlaylistId', false)">
+                                        <i class="bi-bookmark-fill"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a id="favBtn-@playlist.PlaylistId" class="badge ms-auto" onclick="toggleSavePLaylist('@playlist.PlaylistId', true)">
+                                        <i class="bi-bookmark"></i>
+                                    </a>
+                                }
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="no-playlists text-center py-5">
+                <h4 class="text-muted">No Public Playlists Found</h4>
+            </div>
+        }
+    </div>
+</section>
+
+<style>
+
+    .playlist-card {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+
+
+    .playlist-img-wrap {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .playlist-img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .playlist-card:hover .playlist-img {
+        transform: scale(1.1);
+    }
+
+    .playlist-content {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .playlist-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .playlist-creator {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .section-title-wrap {
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .section-description {
+        font-size: 1.1rem;
+        color: #777;
+        margin-bottom: 40px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+    .no-playlists {
+        color: #6c757d;
+    }
+
+</style>
+
+<script>
+    function toggleSavePLaylist(playlistId, isSaving) {
+        $.ajax({
+            url: '/SavePlaylists/ToggleSavePLaylist',
+            type: 'POST',
+            data: {
+                playlistId: playlistId,
+                isSaving: isSaving
+            },
+            success: function (response) {
+                if (isSaving) {
+                    $(`#favBtn-${playlistId}`).attr('onclick', `toggleSavePLaylist('${playlistId}', false)`)
+                        .find('i').removeClass('bi-bookmark').addClass('bi-bookmark-fill');
+                }
+                else {
+                    $(`#favBtn-${playlistId}`).attr('onclick', `toggleSavePLaylist('${playlistId}', true)`)
+                        .find('i').removeClass('bi-bookmark-fill').addClass('bi-bookmark');
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('Please login to interact.');
+            }
+        });
+    }
+
+
+
+</script>

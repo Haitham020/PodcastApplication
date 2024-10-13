@@ -22,6 +22,11 @@
                 <input asp-for="PlaylistDescription" class="form-control" />
                 <span asp-validation-for="PlaylistDescription" class="text-danger"></span>
             </div>
+
+            <div class="form-group form-check">
+                <input asp-for="IsPublic" class="form-check-input" id="isPublic" />
+                <label class="form-check-label" for="IsPublic">Mark As Public</label>
+            </div>
            
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

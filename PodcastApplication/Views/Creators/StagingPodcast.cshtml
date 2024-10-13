@@ -1,0 +1,213 @@
+﻿@model PodcastDetailViewModel
+
+@{
+    ViewData["Title"] = "StagingPodcast";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<style>
+    .modal-backdrop {
+        position: relative;
+        z-index: -1
+    }
+
+
+    .custom-block {
+        padding: 15px;
+    }
+
+    .custom-block-icon-wrap {
+        position: relative;
+        width: 100%;
+    }
+
+    .star {
+        cursor: pointer;
+        font-size: 24px;
+        color: gray;
+    }
+
+        .star.selected {
+            color: gold;
+        }
+</style>
+
+
+<section class="latest-podcast-section section-padding pb-0" id="section_2">
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-lg-10 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">@Model.Podcast!.PodcastTitle</h4>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3 col-12">
+                        <div class="custom-block-icon-wrap">
+                            <div class="custom-block-image-wrap custom-block-image-detail-page">
+                                <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-9 col-12">
+                        <div class="custom-block-info">
+                            <div class="custom-block-top d-flex mb-1">
+
+
+                                <h4>
+                                    @Model.Episodes!.Count() Episodes
+                                </h4>
+
+
+                            </div>
+                            <h4 id="subscriptionCount">
+                                @Model.Podcast.Subscriptions!.Count() Subscriptions
+                            </h4>
+                            <h2 class="mb-2">@Model.Podcast.PodcastTitle</h2>
+                            <h2 class="mb-2">@Model.Podcast.Category!.CategoryName</h2>
+
+                            <p>@Model.Podcast.PodcastDescription</p>
+
+                            <div>
+                                <form asp-action="TogglePublishPodcast" asp-controller="Creators" method="post" id="publishPodcastForm">
+                                    <input type="hidden" name="id" value="@Model.Podcast.PodcastId" />
+                                    @if (Model.Podcast.IsActive)
+                                    {
+                                        <button type="button" id="toggleButton" class="btn btn-secondary" onclick="togglePublish()">UnPublish</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" id="toggleButton" class="btn btn-success" onclick="togglePublish()">Publish</button>
+                                    }
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<section class="latest-podcast-section section-padding pb-0" id="section_2">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-12 col-12">
+                <div class="section-title-wrap mb-5 text-center">
+                    <h4 class="section-title">@Model.Podcast.PodcastTitle episodes</h4>
+                </div>
+            </div>
+            @if (Model.Episodes != null && Model.Episodes.Any())
+            {
+                @foreach (var episode in Model.Episodes)
+                {
+                    <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                        <div class="custom-block d-flex p-3" style="border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                            <div class="me-3">
+                                <div class="custom-block-icon-wrap">
+                                    <a href="detail-page.html" class="custom-block-image-wrap">
+                                        <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid rounded" alt="">
+                                    </a>
+                                </div>
+
+                                <div class="audio-player mt-3">
+                                    <audio controls style="width: 100%;">
+                                        <source src="~/audio/@episode.AudioFile" type="audio/mpeg">
+                                    </audio>
+                                </div>
+
+                                <div class="mt-2">
+                                    <a href="#" class="btn custom-btn btn-sm w-100">Play</a>
+                                </div>
+                            </div>
+
+                            <div class="custom-block-info flex-grow-1">
+                                <div class="custom-block-top d-flex justify-content-between mb-2">
+                                    <small>
+                                        <i class="bi-clock-fill custom-icon"></i> @episode.EpisodeDuration
+                                    </small>
+
+                                    <small class="badge bg-primary">Episode @episode.EpisodeNumber</small>
+                                </div>
+
+                                <h5 class="mb-2">
+                                    <a asp-action="StagingEpisode" asp-controller="Creators"
+                                       asp-route-id="@episode.EpisodeId">
+                                        @episode.EpisodeTitle
+                                    </a>
+                                </h5>
+
+                                <p class="mb-0 text-muted">@episode.EpisodeDescription</p>
+
+                            </div>
+
+                            <div class="d-flex flex-column justify-content-start ms-3">
+                                <a href="#" class="badge bg-secondary mb-2">
+                                    <i class="bi-heart text-light"></i>
+                                </a>
+                                <a href="#" class="badge bg-secondary">
+                                    <i class="bi-bookmark text-light"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <h4>No Episodes Are Added Yet</h4>
+            }
+
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function togglePublish() {
+        var isActive = $('#toggleButton').hasClass('btn-success'); 
+
+        Swal.fire({
+            title: isActive ? 'Publish Podcast?' : 'Unpublish Podcast?',
+            text: isActive ? "Do you want to publish this Podcast?" : "Do you want to unpublish this Podcast?",
+            icon: isActive ? 'success' : 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: isActive ? 'Yes, publish it!' : 'Yes, unpublish it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '@Url.Action("TogglePublishPodcast", "Creators")', 
+                    type: 'POST',
+                    data: $('#publishPodcastForm').serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            if (isActive) {
+                                $('#toggleButton').text('UnPublish').removeClass('btn-success').addClass('btn-secondary');
+                                Swal.fire('Published!', response.message, 'success');
+                            } else {
+                                $('#toggleButton').text('Publish').removeClass('btn-secondary').addClass('btn-success');
+                                Swal.fire('Unpublished!', response.message, 'success');
+                            }
+                        } else {
+                            Swal.fire('Error!', response.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error!', 'An error occurred while updating the publish status.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+
+</script>
