@@ -17,7 +17,7 @@ namespace PodcastApplication.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -334,8 +334,14 @@ namespace PodcastApplication.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("PodcastId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Transcript")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EpisodeId");
 
@@ -540,6 +546,9 @@ namespace PodcastApplication.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PodcastCoverImg")
                         .HasColumnType("nvarchar(max)");
 
@@ -637,6 +646,38 @@ namespace PodcastApplication.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Subscriptions");
+                });
+
+            modelBuilder.Entity("PodcastApplication.Models.UserEpisodeProgress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("EpisodeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("Progress")
+                        .HasColumnType("time");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EpisodeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserEpisodeProgresses");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -861,6 +902,23 @@ namespace PodcastApplication.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("Podcast");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PodcastApplication.Models.UserEpisodeProgress", b =>
+                {
+                    b.HasOne("PodcastApplication.Models.Episode", "Episode")
+                        .WithMany()
+                        .HasForeignKey("EpisodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PodcastApplication.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Episode");
 
                     b.Navigation("User");
                 });

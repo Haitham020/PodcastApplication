@@ -23,6 +23,7 @@ namespace PodcastApplication.Data
         public DbSet<PlaylistItem> PlaylistItems { get; set; }
         public DbSet<EpisodeListener> EpisodeListeners { get; set; }
         public DbSet<SavedPlaylist> SavedPlaylists {  get; set; }
+        public DbSet<UserEpisodeProgress> UserEpisodeProgresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -62,7 +62,7 @@ namespace PodcastApplication.Controllers
 
             var episodes = podcast.Episodes!
                 .Where(x => x.PodcastId == id)
-                .OrderBy(x => x.EpisodeNumber)
+                .OrderBy(x => x.CreatedAt)
                 .ToList();
 
             int episodeNum = 1;

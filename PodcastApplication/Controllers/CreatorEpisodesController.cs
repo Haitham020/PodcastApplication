@@ -10,6 +10,11 @@ using Microsoft.EntityFrameworkCore;
 using NAudio.Wave;
 using PodcastApplication.Data;
 using PodcastApplication.Models;
+using AssemblyAI;
+using AssemblyAI.Transcripts;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 
 namespace PodcastApplication.Controllers
 {
@@ -17,10 +22,12 @@ namespace PodcastApplication.Controllers
     public class CreatorEpisodesController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public CreatorEpisodesController(AppDbContext context)
+        public CreatorEpisodesController(AppDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: CreatorEpisodes
@@ -292,5 +299,72 @@ namespace PodcastApplication.Controllers
         {
             return _context.Episodes.Any(e => e.EpisodeId == id);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Transcribe(Guid episodeId)
+        {
+            var episode = await _context.Episodes.FindAsync(episodeId);
+            if (episode == null || string.IsNullOrEmpty(episode.AudioFile))
+            {
+                return NotFound("Episode or audio file not found");
+            }
+
+            var apiKey = "7d2d8eb3f43f402fa53b42566eedb3e3";
+
+            var physicalPath = Path.Combine(_webHostEnvironment.WebRootPath, "audio", episode.AudioFile);
+
+            if (!System.IO.File.Exists(physicalPath))
+            {
+                return NotFound("Audio file not found on the server");
+            }
+
+            var client = new AssemblyAIClient(apiKey);
+
+            var uploadedFile = await client.Files.UploadAsync(new FileInfo(physicalPath));
+            var fileUrl = uploadedFile.UploadUrl;
+
+            var transcriptParams = new TranscriptParams
+            {
+                AudioUrl = fileUrl,
+                SpeechModel = SpeechModel.Nano,
+                LanguageDetection = true
+            };
+
+            var transcript = await client.Transcripts.TranscribeAsync(transcriptParams);
+
+            while (transcript.Status != TranscriptStatus.Completed)
+            {
+                await Task.Delay(5000);
+
+                transcript = await client.Transcripts.GetAsync(transcript.Id);
+
+                if (transcript.Status == TranscriptStatus.Error)
+                {
+                    return StatusCode(500, "Transcription failed.");
+                }
+            }
+
+            episode.Transcript = transcript.Text; 
+            _context.Episodes.Update(episode);
+            await _context.SaveChangesAsync();
+
+            return Json(new { text = transcript.Text });
+        }
+        [HttpPost]
+        public async Task<IActionResult> SaveTranscript(Guid episodeId, string transcript)
+        {
+            var episode = await _context.Episodes.FindAsync(episodeId);
+            if (episode == null)
+            {
+                return NotFound("Episode not found");
+            }
+
+            episode.Transcript = transcript;
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
     }
 }

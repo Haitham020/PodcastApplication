@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PodcastApplication.Data;
 using PodcastApplication.Models;
 using PodcastApplication.Models.ViewModels;
+using System.Security.Claims;
 
 namespace PodcastApplication.Controllers
 {
@@ -93,5 +94,86 @@ namespace PodcastApplication.Controllers
 
             return View(episodeDetail);
         }
+        [HttpPost]
+        public async Task<IActionResult> SaveProgress(Guid episodeId, double progress)
+        {
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var episodeProgress = await db.UserEpisodeProgresses
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.EpisodeId == episodeId);
+
+
+            if (episodeProgress == null)
+            {
+                episodeProgress = new UserEpisodeProgress
+                {
+                    UserId = userId,
+                    EpisodeId = episodeId,
+                    Progress = TimeSpan.FromSeconds(progress),
+                    LastUpdated = DateTime.Now
+                };
+                await db.UserEpisodeProgresses.AddAsync(episodeProgress);
+
+            }
+            else
+            {
+                episodeProgress.Progress = TimeSpan.FromSeconds(progress);
+                episodeProgress.LastUpdated = DateTime.Now;
+                var episode = await db.Episodes.FindAsync(episodeId);
+                if (TimeSpan.FromSeconds(progress) >= episode!.EpisodeDuration)
+                {
+                    episodeProgress.IsCompleted = true;
+                }
+            }
+            await db.SaveChangesAsync();
+
+            return Ok();
+        }
+        public async Task<IActionResult> GetProgress(Guid episodeId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Forbid();
+            }
+
+            var progress = await db.UserEpisodeProgresses
+                .Where(x => x.UserId == userId && x.EpisodeId == episodeId)
+                .Select(p => p.Progress.TotalSeconds)
+                .FirstOrDefaultAsync();
+
+            return Ok(progress);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddEpisodeListener(Guid episodeId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(userId == null)
+            {
+                return Unauthorized();
+            }
+            var exists = await db.EpisodeListeners
+                .AnyAsync(el => el.UserId == userId && el.EpisodeId == episodeId);
+
+            if (!exists)
+            {
+                EpisodeListener episodeListener = new EpisodeListener
+                {
+                    UserId = userId,
+                    EpisodeId = episodeId,
+                };
+
+                db.EpisodeListeners.Add(episodeListener);
+                await db.SaveChangesAsync();
+            }
+
+            return Ok(); 
+        }
+
     }
 }

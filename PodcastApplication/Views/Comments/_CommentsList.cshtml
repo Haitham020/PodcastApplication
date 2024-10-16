@@ -1,0 +1,17 @@
+﻿@model IEnumerable<Comment>
+@using System.Security.Claims
+
+@foreach (var comment in Model)
+{
+    <div class="comment">
+        <h4>@comment.User!.UserName</h4>
+        <br />
+        <p>@comment.CommentText</p>
+        <small>@comment.CreatedAt.ToString("g")</small>
+        @if (comment.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+        {
+            <button class="btn btn-sm btn-warning edit-comment" data-comment-id="@comment.CommentId">Edit</button>
+            <button class="btn btn-sm btn-danger delete-comment" data-comment-id="@comment.CommentId">Delete</button>
+        }
+    </div>
+}

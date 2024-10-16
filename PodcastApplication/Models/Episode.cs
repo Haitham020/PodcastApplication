@@ -10,6 +10,8 @@ namespace PodcastApplication.Models
         public string? AudioFile { get; set; }
         public TimeSpan EpisodeDuration { get; set; }
         public int EpisodeNumber { get; set; }
+        public bool IsPublic {  get; set; }
+        public string? Transcript { get; set; }
 
         [ForeignKey("Podcast")]
         public Guid PodcastId { get; set; }

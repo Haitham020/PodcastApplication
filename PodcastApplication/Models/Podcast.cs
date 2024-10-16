@@ -8,6 +8,7 @@ namespace PodcastApplication.Models
         public string? PodcastTitle { get; set; }
         public string? PodcastDescription { get; set; }
         public string? PodcastCoverImg { get; set; }
+        public bool IsPublic {  get; set; }
 
         [ForeignKey("Category")]
         public int CategoryId { get; set; }

@@ -1,0 +1,40 @@
+﻿@model SearchViewModel
+
+@{
+    ViewData["Title"] = "Searched Results";
+}
+
+
+
+@if (Model.Podcasts!.Any())
+{
+    <h3>Podcasts</h3>
+    <ul>
+        @foreach (var podcast in Model.Podcasts!)
+        {
+            <li>@podcast.PodcastTitle</li>
+        }
+    </ul>
+}
+
+@if (Model.Episodes!.Any())
+{
+    <h3>Episodes</h3>
+    <ul>
+        @foreach (var episode in Model.Episodes!)
+        {
+            <li>@episode.EpisodeTitle</li>
+        }
+    </ul>
+}
+
+@if (Model.Categories!.Any())
+{
+    <h3>Categories</h3>
+    <ul>
+        @foreach (var category in Model.Categories!)
+        {
+            <li>@category.CategoryName</li>
+        }
+    </ul>
+}

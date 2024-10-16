@@ -73,6 +73,23 @@
 
                                 </form>
                             </div>
+                            @if (Model.Episode.Transcript != null)
+                            {
+                                <textarea id="transcriptTextArea" style="width:100%; height:200px;">@Model.Episode.Transcript</textarea>
+                                <button id="saveTranscriptButton" class="btn btn-success">Save Transcript</button>
+
+                            }
+                            else
+                            {
+                                <button id="transcribeButton" class="btn btn-primary">Transcribe Audio</button>
+                                <div id="transcriptionResult">
+                                    <textarea id="transcriptTextArea" style="display:none; width:100%; height:200px;"></textarea>
+                                    <button id="saveTranscriptButton" style="display:none;" class="btn btn-success">Save Transcript</button>
+                                </div>
+                            }
+
+
+
                         </div>
                     </div>
                 </div>
@@ -86,7 +103,7 @@
 
 <script>
     function togglePublish() {
-        var isActive = $('#toggleButton').hasClass('btn-success'); 
+        var isActive = $('#toggleButton').hasClass('btn-success');
 
         Swal.fire({
             title: isActive ? 'Publish Episode?' : 'Unpublish Episode?',
@@ -103,7 +120,7 @@
                     data: $('#publishForm').serialize(),
                     success: function (response) {
                         if (response.success) {
-                            
+
                             if (isActive) {
                                 $('#toggleButton').text('UnPublish').removeClass('btn-success').addClass('btn-secondary');
                                 Swal.fire('Published!', response.message, 'success');
@@ -122,6 +139,55 @@
             }
         });
     }
+
+
+    //Transcript
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const transcribeButton = document.getElementById('transcribeButton');
+        const transcriptTextArea = document.getElementById('transcriptTextArea');
+        const saveTranscriptButton = document.getElementById('saveTranscriptButton');
+
+        let episodeId = '@Model.Episode.EpisodeId';
+
+        if (transcribeButton) {
+            transcribeButton.addEventListener('click', function () {
+                $.ajax({
+                    url: '/CreatorEpisodes/Transcribe', 
+                    type: 'POST',
+                    data: {
+                        episodeId: episodeId
+                    },
+                    success: function (response) {
+                        console.log('Transcription result:', response.text);
+                        transcriptTextArea.value = response.text; 
+                        transcriptTextArea.style.display = 'block'; 
+                        saveTranscriptButton.style.display = 'block';
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error transcribing audio:", error);
+                    }
+                });
+            });
+        }
+    });
+
+    $('#saveTranscriptButton').on('click', function () {
+        let editedTranscript = $('#transcriptTextArea').val();
+        let episodeId = '@Model.Episode.EpisodeId';
+
+        $.ajax({
+            url: '/CreatorEpisodes/SaveTranscript',
+            type: 'POST',
+            data: { episodeId: episodeId, transcript: editedTranscript },
+            success: function () {
+                alert('Transcript saved successfully!');
+            },
+            error: function () {
+                alert('Error saving the transcript.');
+            }
+        });
+    });
 
 
 

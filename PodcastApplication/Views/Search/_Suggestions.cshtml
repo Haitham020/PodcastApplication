@@ -1,0 +1,17 @@
+﻿@model IEnumerable<string>
+
+<ul class="list-group">
+    @foreach (var suggestion in Model)
+    {
+        <li class="list-group-item" onclick="selectSuggestion('@suggestion')">@suggestion</li>
+    }
+</ul>
+
+<script>
+    function selectSuggestion(suggestion) {
+        $('#search').val(suggestion);
+        $('#suggestionsBox').hide();
+
+        window.location.href = '/Search/Search?query=' + encodeURIComponent(suggestion);
+    }
+</script>
