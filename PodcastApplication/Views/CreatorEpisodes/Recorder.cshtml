@@ -1,0 +1,256 @@
+﻿@{
+    ViewData["Title"] = "Recorder";
+}
+
+<style>
+    
+
+    #recorder-controls {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: none;
+        margin: 5px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+
+    button:disabled {
+        background-color: #d0d0d0;
+        cursor: not-allowed;
+    }
+
+    #status {
+        font-size: 18px;
+        margin: 15px 0;
+        color: #333;
+    }
+
+    #red-dot {
+        width: 15px;
+        height: 15px;
+        background-color: red;
+        border-radius: 50%;
+        display: none;
+        margin: 0 auto;
+    }
+
+    #audio-playback {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    audio {
+        width: 100%;
+        max-width: 400px;
+        display: block;
+        margin: 20px auto;
+    }
+
+    a#downloadRecording {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    a#downloadRecording:hover {
+        background-color: #218838;
+    }
+
+    
+</style>
+
+<div id="recorder-controls">
+    <button id="startRecord">🎙️ Start Recording</button>
+    <button id="pauseRecord" disabled>⏸️ Pause Recording</button>
+    <button id="resumeRecord" disabled>▶️ Resume Recording</button>
+    <button id="stopRecord" disabled>⏹️ Stop Recording</button>
+    <button id="resetRecord" disabled>🔄 Reset</button>
+</div>
+
+<div id="recording-status">
+    <p id="status">Recorder not started</p>
+    <div id="red-dot"></div>
+    <p id="durationDisplay">Duration: 00:00:00</p> <!-- Display duration here -->
+</div>
+
+<div id="audio-playback">
+    <audio id="audioPlayback" controls style="display:none;"></audio>
+    <a id="downloadRecording" download="recording.webm" style="display:none;">⬇️ Download Recording</a>
+</div>
+
+<script>
+    let mediaRecorder;
+    let recordedChunks = [];
+    let isRecording = false;
+    let startTime, durationInterval, elapsedBeforePause = 0;
+
+    const startButton = document.getElementById('startRecord');
+    const pauseButton = document.getElementById('pauseRecord');
+    const resumeButton = document.getElementById('resumeRecord');
+    const stopButton = document.getElementById('stopRecord');
+    const resetButton = document.getElementById('resetRecord');
+    const audioPlayback = document.getElementById('audioPlayback');
+    const downloadLink = document.getElementById('downloadRecording');
+    const statusText = document.getElementById('status');
+    const redDot = document.getElementById('red-dot');
+    const durationDisplay = document.getElementById('durationDisplay');
+
+    // Helper function to format duration into hh:mm:ss
+    function formatDuration(milliseconds) {
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    // Function to update the duration display while recording
+    function updateDuration() {
+        const now = Date.now();
+        const elapsed = now - startTime + elapsedBeforePause; // Include paused duration
+        durationDisplay.innerText = `Duration: ${formatDuration(elapsed)}`;
+    }
+
+    // Initialize media recorder
+    async function startRecording() {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        // Capture the start time
+        startTime = Date.now();
+
+        // Start updating the duration every second
+        durationInterval = setInterval(updateDuration, 1000);
+
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            // Stop updating the duration when recording stops
+            clearInterval(durationInterval);
+
+            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+            audioPlayback.src = url;
+
+            // Enable download link
+            downloadLink.href = url;
+            downloadLink.style.display = 'block';
+
+            // Show audio playback
+            audioPlayback.style.display = 'block';
+
+            // Calculate the final duration and display it (avoiding extra seconds after stop)
+            const finalDuration = elapsedBeforePause;
+            durationDisplay.innerText = `Duration: ${formatDuration(finalDuration)}`;
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+
+        // Update buttons state
+        startButton.disabled = true;
+        pauseButton.disabled = false;
+        stopButton.disabled = true;
+        resetButton.disabled = false;
+
+        statusText.innerText = "Recording started...";
+        redDot.style.display = 'block';
+    }
+
+    // Pause recording
+    function pauseRecording() {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.pause();
+            clearInterval(durationInterval); // Stop updating the duration when paused
+            elapsedBeforePause += Date.now() - startTime; // Save the elapsed time so far
+            statusText.innerText = "Recording paused...";
+            pauseButton.disabled = true;
+            resumeButton.disabled = false;
+            stopButton.disabled = false;
+
+        }
+    }
+
+    // Resume recording
+    function resumeRecording() {
+        if (mediaRecorder && mediaRecorder.state === "paused") {
+            mediaRecorder.resume();
+            startTime = Date.now(); // Reset the start time to now
+            durationInterval = setInterval(updateDuration, 1000); // Resume updating the duration
+            statusText.innerText = "Recording resumed...";
+            resumeButton.disabled = true;
+            pauseButton.disabled = false;
+        }
+    }
+
+    // Stop recording
+    function stopRecording() {
+        if (mediaRecorder && isRecording) {
+            
+
+            mediaRecorder.stop();
+            isRecording = false;
+
+            // Reset buttons
+            pauseButton.disabled = true;
+            resumeButton.disabled = true;
+            stopButton.disabled = true;
+            startButton.disabled = true;
+            redDot.style.display = 'none';
+            statusText.innerText = "Recording stopped.";
+        }
+    }
+
+    // Reset recorder
+    function resetRecorder() {
+        recordedChunks = [];
+        isRecording = false;
+        elapsedBeforePause = 0; // Reset elapsed time
+
+        // Reset buttons
+        startButton.disabled = false;
+        pauseButton.disabled = true;
+        resumeButton.disabled = true;
+        stopButton.disabled = true;
+        resetButton.disabled = true;
+
+        // Clear audio playback
+        audioPlayback.src = '';
+        audioPlayback.style.display = 'none';
+        downloadLink.style.display = 'none';
+        statusText.innerText = "Recorder reset.";
+        redDot.style.display = 'none';
+        durationDisplay.innerText = 'Duration: 00:00:00'; // Reset the duration display
+    }
+
+    // Attach event listeners
+    startButton.addEventListener('click', startRecording);
+    pauseButton.addEventListener('click', pauseRecording);
+    resumeButton.addEventListener('click', resumeRecording);
+    stopButton.addEventListener('click', stopRecording);
+    resetButton.addEventListener('click', resetRecorder);
+</script>
+
+

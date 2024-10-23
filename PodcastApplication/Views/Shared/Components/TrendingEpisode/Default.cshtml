@@ -17,17 +17,15 @@
                     <h4 class="section-title">Trending episodes</h4>
                 </div>
             </div>
-            @if(Model.Any() && Model != null)
+            @if (Model != null && Model.Any())
             {
                 @foreach (var trending in Model)
                 {
-                   
-
                     <div class="col-lg-4 col-12 mb-4 mb-lg-0">
                         <div class="custom-block custom-block-full">
                             <div class="custom-block-image-wrap">
                                 <a asp-action="EpisodeDetails" asp-controller="Episodes"
-                                   asp-route-id="@trending!.EpisodeId">
+                                   asp-route-id="@trending?.EpisodeId">
                                     <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
                                 </a>
                             </div>
@@ -35,35 +33,33 @@
                             <div class="custom-block-info">
                                 <h5 class="mb-2">
                                     <a asp-action="EpisodeDetails" asp-controller="Episodes"
-                                       asp-route-id="@trending.EpisodeId">
-                                        @trending.EpisodeTitle
-
+                                       asp-route-id="@trending?.EpisodeId">
+                                        @trending?.EpisodeTitle
                                     </a>
                                 </h5>
-                
 
                                 <div class="profile-block d-flex">
                                     <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
 
                                     <p>
-                                        @trending.Podcast!.Creator!.UserName
-                                        <strong>@trending.Podcast.Creator.CreatorGenre</strong>
+                                        @trending?.Podcast?.Creator?.UserName
+                                        <strong>@trending?.Podcast?.Creator?.CreatorGenre</strong>
                                     </p>
                                 </div>
 
-                                <p class="mb-0">@trending.EpisodeDescription</p>
+                                <p class="mb-0">@trending?.EpisodeDescription</p>
 
                                 <div class="custom-block-bottom d-flex justify-content-between mt-3">
                                     <a href="#" class="bi-headphones me-1">
-                                        <span>@(trending.EpisodeListeners?.Count() ?? 0)</span>
+                                        <span>@(trending?.EpisodeListeners?.Count() ?? 0)</span>
                                     </a>
 
-                                    <a id="like-count-@trending.EpisodeId" class="bi-heart me-1">
-                                        <span>@(trending.EpisodeLikes?.Count() ?? 0)</span>
+                                    <a id="like-count-@trending?.EpisodeId" class="bi-heart me-1">
+                                        <span>@(trending?.EpisodeLikes?.Count() ?? 0)</span>
                                     </a>
 
                                     <a href="#" class="bi-chat me-1">
-                                        <span>@(trending.Comments?.Count() ?? 0)</span>
+                                        <span>@(trending?.Comments?.Count() ?? 0)</span>
                                     </a>
                                 </div>
                             </div>
@@ -73,8 +69,9 @@
             }
             else
             {
-                <h4>No Trending Episodes Yet</h4>
+                <h4>No Trending Episodes Found</h4>
             }
+
             
         </div>
     </div>

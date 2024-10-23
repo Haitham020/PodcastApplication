@@ -27,11 +27,16 @@
                 <input id="audioFileInput" asp-for="AudioFile" type="file" class="form-control" />
                 <span asp-validation-for="AudioFile" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="EpisodeCoverImg" class="control-label"></label>
+                <input asp-for="EpisodeCoverImg" name="imgFile" type="file" class="form-control" />
+                <span asp-validation-for="EpisodeCoverImg" class="text-danger"></span>
+            </div>
 
             <div class="form-group">
                 <label asp-for="EpisodeDuration" class="control-label">Episode Duration</label>
                 <input id="EpisodeDuration" asp-for="EpisodeDuration" class="form-control" readonly />
-                <span asp-validation-for="EpisodeDuration" class="text-danger">Check the uploaded audio file</span>
+                <span asp-validation-for="EpisodeDuration" class="text-secondary">Check the uploaded audio file</span>
                 <span id="loadingIndicator" style="display:none; margin-left:10px;">
                     <i class="fa fa-spinner fa-spin"></i> Loading...
                 </span>
@@ -39,7 +44,7 @@
            
             <div class="form-group">
                 <label asp-for="PodcastId" class="control-label"></label>
-                <select asp-for="PodcastId" class ="form-control" asp-items="ViewBag.PodcastId"></select>
+                <select asp-for="PodcastId" class ="form-control" asp-items="ViewBag.PodcastId" required></select>
             </div>
            
             <div class="form-group">

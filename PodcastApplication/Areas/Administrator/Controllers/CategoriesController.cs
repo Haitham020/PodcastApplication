@@ -57,10 +57,29 @@ namespace PodcastApplication.Areas.Administrator.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,IsActive,IsDeleted,CreatedAt")] Category category)
+        public async Task<IActionResult> Create(Category category, IFormFile imgFile)
         {
             if (ModelState.IsValid)
             {
+                var extension = Path.GetExtension(imgFile.FileName).ToLower();
+                var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".svg" };
+
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError("AudioFile", "Invalid file type. Please upload only audio files (mp3, wav, etc.).");
+                    return View(category);
+                }
+                if (imgFile != null && imgFile.Length > 0)
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(),
+                        "wwwroot/images/topics", imgFile.FileName);
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await imgFile.CopyToAsync(stream);
+                    }
+                    category.CategoryImg = imgFile.FileName;
+                }
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -89,7 +108,7 @@ namespace PodcastApplication.Areas.Administrator.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName,IsActive,IsDeleted,CreatedAt")] Category category)
+        public async Task<IActionResult> Edit(int id, IFormFile imgFile,Category category)
         {
             if (id != category.CategoryId)
             {
@@ -100,6 +119,26 @@ namespace PodcastApplication.Areas.Administrator.Controllers
             {
                 try
                 {
+                    var extension = Path.GetExtension(imgFile.FileName).ToLower();
+                    var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".svg" };
+
+
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError("AudioFile", "Invalid file type. Please upload only audio files (mp3, wav, etc.).");
+                        return View(category);
+                    }
+                    if (imgFile != null && imgFile.Length > 0)
+                    {
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(),
+                            "wwwroot/images/topics", imgFile.FileName);
+                        using (var stream = System.IO.File.Create(filePath))
+                        {
+                            await imgFile.CopyToAsync(stream);
+                        }
+                        category.CategoryImg = imgFile.FileName;
+
+                    }
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                 }

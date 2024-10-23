@@ -10,28 +10,31 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="PodcastTitle" class="control-label"></label>
-                <input asp-for="PodcastTitle" class="form-control" />
+                <input asp-for="PodcastTitle" class="form-control" required/>
                 <span asp-validation-for="PodcastTitle" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="PodcastDescription" class="control-label"></label>
-                <input asp-for="PodcastDescription" class="form-control" />
+                <input asp-for="PodcastDescription" class="form-control" required />
                 <span asp-validation-for="PodcastDescription" class="text-danger"></span>
             </div>
+            
             <div class="form-group">
                 <label asp-for="PodcastCoverImg" class="control-label"></label>
-                <input asp-for="PodcastCoverImg" class="form-control" />
+                <input type="file" name="imgFile" asp-for="PodcastCoverImg" class="form-control" required />
                 <span asp-validation-for="PodcastCoverImg" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Category" required>
+                    <option>--- Select Category ---</option>
+                </select>
             </div>
-                      
+            
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

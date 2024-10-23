@@ -19,8 +19,10 @@ namespace PodcastApplication.ViewComponents
                 .OrderByDescending(e => e.EpisodeLikes!.Count())
                 .Include(c => c.Comments)
                 .Include(x => x.EpisodeListeners)
-                .Take(3).Include(p => p.Podcast)
+                .Include(p => p.Podcast)
                 .ThenInclude(x => x!.Creator)
+                .Where(x => x.IsPublic)
+                .Take(3)
                 .ToListAsync();
 
 

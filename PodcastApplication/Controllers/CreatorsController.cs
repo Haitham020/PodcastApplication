@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PodcastApplication.Data;
 using PodcastApplication.Models;
 using PodcastApplication.Models.ViewModels;
+using System.Linq;
 using System.Security.Claims;
 
 namespace PodcastApplication.Controllers
@@ -43,7 +44,7 @@ namespace PodcastApplication.Controllers
 
 
             var podcast = await _db.Podcasts
-                .Include(e => e.Episodes)!
+                .Include(e => e.Episodes!.Where(e => e.IsActive))!
                     .ThenInclude(x => x.Comments)
                 .Include(e => e.Episodes)!
                     .ThenInclude(i => i.EpisodeLikes)
@@ -87,22 +88,21 @@ namespace PodcastApplication.Controllers
         {
             var podcast = await _db.Podcasts
         .Include(p => p.Episodes)
-        .FirstOrDefaultAsync(p => p.PodcastId == id);
+        .FirstOrDefaultAsync(p => p.PodcastId == id && p.IsActive);
 
-           
+
             if (podcast == null)
             {
                 return Json(new { success = false, message = "Podcast not found." });
             }
 
-            if (podcast!.IsActive)
+            if (podcast!.IsPublic)
             {
-                podcast.IsActive = false;
-                podcast.IsDeleted = true;
+                podcast.IsPublic = false;
                 foreach (var episode in podcast.Episodes!)
                 {
-                    episode.IsActive = false;
-                    episode.IsDeleted = true;
+                    episode.IsPublic = false;
+
                 }
                 await _db.SaveChangesAsync();
                 return Json(new { success = true, message = "Podcast unpublished successfully!" });
@@ -112,12 +112,11 @@ namespace PodcastApplication.Controllers
             {
                 if (podcast.Episodes!.Any() && podcast.Episodes != null)
                 {
-                    podcast.IsActive = true;
-                    podcast.IsDeleted = false;
+                    podcast.IsPublic = true;
+
                     foreach (var episode in podcast.Episodes)
                     {
-                        episode.IsActive = true;
-                        episode.IsDeleted = false;
+                        episode.IsPublic = true;
                     }
 
                     await _db.SaveChangesAsync();
@@ -128,7 +127,7 @@ namespace PodcastApplication.Controllers
                     return Json(new { success = false, message = "Cannot publish an Podcast without episode(s)." });
                 }
             }
-            
+
         }
         [HttpGet]
         public async Task<IActionResult> StagingEpisode(Guid id)
@@ -171,36 +170,106 @@ namespace PodcastApplication.Controllers
         public async Task<IActionResult> TogglePublishEpisode(Guid id)
         {
             var episode = await _db.Episodes
-         .Include(e => e.Podcast)  
-         .FirstOrDefaultAsync(e => e.EpisodeId == id);
+         .Include(e => e.Podcast)
+         .FirstOrDefaultAsync(e => e.EpisodeId == id && e.IsActive);
+
+            var episodesCount = await _db.Episodes
+                .CountAsync(x => x.PodcastId == episode!.PodcastId && x.IsPublic && x.IsActive);
 
             if (episode == null)
             {
                 return Json(new { success = false, message = "Episode not found." });
             }
-            if(episode.IsActive)
+            if (episode.IsPublic)
             {
-                episode.IsActive = false;
-                episode.IsDeleted = true;
+                if (episodesCount <= 1)
+                {
+                    return Json(new { success = false, message = "Cannot unpublish an episode that is the only episode exists in podcast" });
+                }
+                else
+                {
+                    episode.IsPublic = false;
 
-                await _db.SaveChangesAsync();
-                return Json(new { success = true, message = "Episode unpublished successfully!" });
+                    await _db.SaveChangesAsync();
+                    return Json(new { success = true, message = "Episode unpublished successfully!" });
+                }
+
 
             }
             else
             {
-                if (episode.Podcast!.IsDeleted)
+                if (!episode.Podcast!.IsPublic)
                 {
                     return Json(new { success = false, message = "Cannot publish an episode for a podcast that is inactive." });
                 }
 
-                episode.IsActive = true;
-                episode.IsDeleted = false;
+                episode.IsPublic = true;
+
 
                 await _db.SaveChangesAsync();
                 return Json(new { success = true, message = "Episode published successfully!" });
             }
-            
+
         }
+        [HttpGet]
+        public async Task<IActionResult> EditProfile(string id)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _db.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return View(user);
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditProfile(string id, IFormFile imgFile, ApplicationUser user)
+        {
+            var existingUser = await _db.Users.FindAsync(id);
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
+
+            existingUser.UserName = user.UserName;
+            existingUser.ProfileBio = user.ProfileBio;
+            existingUser.CreatorGenre = user.CreatorGenre;
+
+
+            try
+            {
+                if (imgFile != null && imgFile.Length > 0)
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(),
+                        "wwwroot/images/profile", imgFile.FileName);
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await imgFile.CopyToAsync(stream);
+                    }
+                    existingUser.ProfileImg = imgFile.FileName;
+                }
+
+                _db.Update(existingUser);
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (id != user.Id)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction("CreatorProfile", "Creators");
+        }
+
     }
 }

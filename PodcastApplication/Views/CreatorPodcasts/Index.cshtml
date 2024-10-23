@@ -7,72 +7,70 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create"><strong>Create New Podcast</strong></a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.PodcastTitle)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PodcastDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PodcastCoverImg)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Creator)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsDeleted)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.PodcastTitle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PodcastDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PodcastCoverImg)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category!.CategoryId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Creator!.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsDeleted)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PodcastId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PodcastId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PodcastId">Delete</a> |
-                <a asp-action="StagingPodcast" asp-controller="Creators" asp-route-id="@item.PodcastId">Publish</a>
-            </td>
-        </tr>
+
+@if(!Model.Any())
+{
+    <div class="alert alert-warning">
+        No podcasts available. Please create a new podcast.
+    </div>
 }
-    </tbody>
-</table>
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.PodcastTitle)
+                </th>
+
+                <th>
+                    @Html.DisplayNameFor(model => model.Category)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Creator)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IsActive)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IsDeleted)
+                </th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PodcastTitle)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category!.CategoryName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Creator!.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsActive)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsDeleted)
+                    </td>
+
+                    <td>
+                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.PodcastId">Edit</a> |
+                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.PodcastId">Details</a> |
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.PodcastId">Delete</a> |
+                        <a class="btn btn-success" asp-action="StagingPodcast" asp-controller="Creators" asp-route-id="@item.PodcastId">Manage</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+

@@ -1,0 +1,34 @@
+﻿@model ApplicationUser
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container mt-5">
+    <h2>Edit Profile</h2>
+    <form asp-action="EditProfile" enctype="multipart/form-data" method="post">
+        <div class="mb-3">
+            <label asp-for="UserName" class="form-label">User Name</label>
+            <input asp-for="UserName" class="form-control" required />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="CreatorGenre" class="form-label">Genre</label>
+            <input asp-for="CreatorGenre" class="form-control" />
+            <span asp-validation-for="CreatorGenre" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ProfileImg" class="form-label">Profile Picture</label>
+            <input asp-for="ProfileImg" name="imgFile" type="file" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="ProfileBio" class="form-label">Profile Bio</label>
+            <input asp-for="ProfileBio" class="form-control" />
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+    <a class="btn btn-warning" asp-action="ListenerProfile">Back</a>
+</div>

@@ -20,6 +20,7 @@ namespace PodcastApplication.Controllers
             var episodes = await db.Episodes
                 .Include(c => c.Comments)
                 .Include(i => i.EpisodeLikes)
+                .Include(i => i.EpisodeListeners)
                 .Include(x => x.Podcast)
                 .ThenInclude(x => x!.Creator)
                 .OrderBy(e => e.CreatedAt)
@@ -37,8 +38,7 @@ namespace PodcastApplication.Controllers
                     episodeNum++;
                 }
             }
-            var displayedEpisodes = episodes.Take(20);
-            return View(displayedEpisodes);
+            return View(episodes);
         }
 
         [HttpGet]
@@ -124,7 +124,8 @@ namespace PodcastApplication.Controllers
                 episodeProgress.Progress = TimeSpan.FromSeconds(progress);
                 episodeProgress.LastUpdated = DateTime.Now;
                 var episode = await db.Episodes.FindAsync(episodeId);
-                if (TimeSpan.FromSeconds(progress) >= episode!.EpisodeDuration)
+                
+                if (TimeSpan.FromSeconds(progress) >= episode!.EpisodeDuration - TimeSpan.FromSeconds(35))
                 {
                     episodeProgress.IsCompleted = true;
                 }

@@ -59,7 +59,7 @@ namespace PodcastApplication.Areas.Administrator.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Episode episode, IFormFile audioFile)
+        public async Task<IActionResult> Create(Episode episode, IFormFile audioFile, IFormFile imgFile)
         {
             if (ModelState.IsValid)
             {
@@ -80,7 +80,17 @@ namespace PodcastApplication.Areas.Administrator.Controllers
                     }
 
                 }
-                
+                if (imgFile != null && imgFile.Length > 0)
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(),
+                        "wwwroot/images/episode", imgFile.FileName);
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await imgFile.CopyToAsync(stream);
+                    }
+                    episode.EpisodeCoverImg = imgFile.FileName;
+                }
+
                 episode.EpisodeNumber = 1;
                 episode.IsActive = true;
                 episode.IsDeleted = false;
@@ -111,41 +121,48 @@ namespace PodcastApplication.Areas.Administrator.Controllers
             return View(episode);
         }
 
-        // POST: Administrator/Episodes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Episode episode)
+        public async Task<IActionResult> Edit(Guid id, Episode episode, IFormFile imgFile)
         {
             if (id != episode.EpisodeId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Check if image file was provided
+            if (imgFile != null && imgFile.Length > 0)
             {
-                try
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/episode", imgFile.FileName);
+                using (var stream = System.IO.File.Create(filePath))
                 {
-                    _context.Update(episode);
-                    await _context.SaveChangesAsync();
+                    await imgFile.CopyToAsync(stream);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EpisodeExists(episode.EpisodeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                episode.EpisodeCoverImg = imgFile.FileName; // Assign the file name only if a new file is uploaded
             }
-            ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastId", episode.PodcastId);
-            return View(episode);
+
+            try
+            {
+                // Update episode details without requiring a new image file every time
+                _context.Update(episode);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EpisodeExists(episode.EpisodeId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Administrator/Episodes/Delete/5
         public async Task<IActionResult> Delete(Guid? id)

@@ -252,6 +252,9 @@ namespace PodcastApplication.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
 
+                    b.Property<string>("CategoryImg")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CategoryName")
                         .HasColumnType("nvarchar(max)");
 
@@ -315,6 +318,9 @@ namespace PodcastApplication.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("EpisodeCoverImg")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EpisodeDescription")
                         .HasColumnType("nvarchar(max)");

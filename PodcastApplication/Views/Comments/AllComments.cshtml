@@ -1,0 +1,183 @@
+﻿@model IEnumerable<Comment>
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "All Comments";
+}
+@{
+    var episodeId = ViewBag.EpisodeId;
+
+    var userName = Model.FirstOrDefault()?.User?.UserName ?? "Anonymous";
+}
+
+
+<div class="container mt-5">
+    <h1 class="mb-4">Comments</h1>
+
+    <div class="mt-4">
+        <h3>Add a Comment</h3>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="newCommentText" placeholder="Write your comment here..." />
+            <input type="hidden" id="episodeId" value="@episodeId" />
+            <input type="hidden" id="userName" value="@userName" />
+            <button class="btn btn-success" onclick="addComment()">Post Comment</button>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No comments yet.</div>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var comment in Model)
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-start mb-2">
+                    <div class="w-75">
+                        <strong>@comment.User!.UserName</strong>
+                        <p id="comment-text-@comment.CommentId">@comment.CommentText</p>
+                        <small class="text-muted">@comment.CreatedAt</small>
+                    </div>
+                    @if (comment.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    {
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="editComment(@comment.CommentId)">Edit</button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteComment(@comment.CommentId)">Delete</button>
+                        </div>
+                    }
+                </div>
+
+                <div class="edit-comment-container" id="edit-comment-@comment.CommentId" style="display:none;">
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" id="edit-input-@comment.CommentId" value="@comment.CommentText" />
+                        <button class="btn btn-primary" onclick="saveComment(@comment.CommentId)">Save</button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function addComment() {
+            const commentText = $('#newCommentText').val();
+            const episodeId = $('#episodeId').val();
+
+            $.ajax({
+                url: '/Comments/AddComment',
+                type: 'POST',
+                data: {
+                    id: episodeId,
+                    commentText: commentText
+                },
+                success: function (newComment) {
+                    displayNewComment(newComment);
+                    $('#newCommentText').val('');
+                },
+                error: function () {
+                    alert('Failed to add comment.');
+                }
+            });
+            displayNewComment();
+        }
+
+        function displayNewComment(comment) {
+            const commentsList = $('.list-group');
+            const newCommentHTML = `
+                        <div class="list-group-item d-flex justify-content-between align-items-start mb-2">
+                            <div class="w-75">
+                                <strong>${comment.userName}</strong>
+                                <p id="comment-text-${comment.id}">${comment.commentText}</p>
+                                <small class="text-muted">${comment.createdAt}</small>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-secondary btn-sm" onclick="editComment(${comment.id})">Edit</button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="deleteComment(${comment.id})">Delete</button>
+                            </div>
+                        </div>
+                                <div class="edit-comment-container" id="edit-comment-${comment.id}" style="display:none;">
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" id="edit-input-${comment.id}" value="${comment.commentText}" />
+                        <button class="btn btn-primary" onclick="saveComment(${comment.id})">Save</button>
+                    </div>
+                </div>
+                    `;
+            commentsList.append(newCommentHTML);
+        }
+
+        function editComment(commentId) {
+            $(`#comment-text-${commentId}`).hide();
+            $(`#edit-comment-${commentId}`).show();
+        }
+
+        function saveComment(commentId) {
+            const updatedText = $(`#edit-input-${commentId}`).val();
+
+            $.ajax({
+                url: '/Comments/EditComment',
+                type: 'POST',
+                data: {
+                    commentId: commentId,
+                    updatedText: updatedText
+                },
+                success: function () {
+                    $(`#comment-text-${commentId}`).text(updatedText).show();
+                    $(`#edit-comment-${commentId}`).hide();
+                },
+                error: function () {
+                    alert('Failed to save comment.');
+                }
+            });
+        }
+
+        function deleteComment(commentId) {
+            if (confirm('Are you sure to delete this comment?')) {
+                $.ajax({
+                    url: '/Comments/DeleteComment',
+                    type: 'POST',
+                    data: { commentId: commentId },
+                    success: function () {
+                        $(`#comment-text-${commentId}`).closest('.list-group-item').remove();
+                    },
+                    error: function () {
+                        alert('Failed to delete comment.');
+                    }
+                });
+            }
+        }
+    </script>
+}
+
+<style>
+    .edit-comment-container {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .list-group-item {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #ffffff;
+        transition: background-color 0.3s;
+    }
+
+        .list-group-item:hover {
+            background-color: #f1f1f1;
+        }
+
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .btn {
+        margin-left: 5px;
+    }
+</style>

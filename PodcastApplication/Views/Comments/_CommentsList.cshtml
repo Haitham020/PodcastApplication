@@ -8,10 +8,12 @@
         <br />
         <p>@comment.CommentText</p>
         <small>@comment.CreatedAt.ToString("g")</small>
-        @if (comment.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
-        {
-            <button class="btn btn-sm btn-warning edit-comment" data-comment-id="@comment.CommentId">Edit</button>
-            <button class="btn btn-sm btn-danger delete-comment" data-comment-id="@comment.CommentId">Delete</button>
-        }
+        <div class="comment-actions mt-2">
+            @if (comment.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                <button class="btn btn-sm btn-warning edit-comment" data-comment-id="@comment.CommentId">Edit</button>
+                <button class="btn btn-sm btn-danger delete-comment" data-comment-id="@comment.CommentId">Delete</button>
+            }
+        </div>
     </div>
 }

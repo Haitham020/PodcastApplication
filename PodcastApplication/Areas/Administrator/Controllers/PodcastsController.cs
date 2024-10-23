@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -62,10 +63,32 @@ namespace PodcastApplication.Areas.Administrator.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Podcast podcast)
+        public async Task<IActionResult> Create(Podcast podcast, IFormFile imgFile)
         {
             if (ModelState.IsValid)
             {
+                var extension = Path.GetExtension(imgFile.FileName).ToLower();
+                var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".svg"};
+
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError("AudioFile", "Invalid file type. Please upload only audio files (mp3, wav, etc.).");
+                    ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
+                    return View(podcast);
+                }
+
+
+                if (imgFile != null && imgFile.Length > 0)
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(),
+                        "wwwroot/images/podcast", imgFile.FileName);
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await imgFile.CopyToAsync(stream);
+                    }
+                    podcast.PodcastCoverImg = imgFile.FileName;
+                }
                 podcast.PodcastId = Guid.NewGuid();
                 _context.Add(podcast);
                 await _context.SaveChangesAsync();
@@ -76,7 +99,7 @@ namespace PodcastApplication.Areas.Administrator.Controllers
             return View(podcast);
         }
 
-        // GET: Administrator/Podcasts/Edit/5
+       
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -89,47 +112,54 @@ namespace PodcastApplication.Areas.Administrator.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", podcast.CategoryId);
-            ViewData["CreatorId"] = new SelectList(_context.Users, "Id", "Id", podcast.CreatorId);
+            ViewBag.Category = new SelectList(_context.Categories, "CategoryId", "CategoryName");
             return View(podcast);
         }
 
-        // POST: Administrator/Podcasts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Podcast podcast)
+        public async Task<IActionResult> Edit(Guid id, Podcast podcast, IFormFile imgFile)
         {
+
             if (id != podcast.PodcastId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Check if image file was provided
+            if (imgFile != null && imgFile.Length > 0)
             {
-                try
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/profile", imgFile.FileName);
+                using (var stream = System.IO.File.Create(filePath))
                 {
-                    _context.Update(podcast);
-                    await _context.SaveChangesAsync();
+                    await imgFile.CopyToAsync(stream);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PodcastExists(podcast.PodcastId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                podcast.PodcastCoverImg = imgFile.FileName; // Assign the file name only if a new file is uploaded
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", podcast.CategoryId);
-            ViewData["CreatorId"] = new SelectList(_context.Users, "Id", "Id", podcast.CreatorId);
-            return View(podcast);
+
+            try
+            {
+                podcast.Creator = podcast.Creator;
+
+                _context.Update(podcast);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PodcastExists(podcast.PodcastId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Administrator/Podcasts/Delete/5
         public async Task<IActionResult> Delete(Guid? id)

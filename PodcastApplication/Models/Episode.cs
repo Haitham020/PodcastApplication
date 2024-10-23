@@ -12,6 +12,7 @@ namespace PodcastApplication.Models
         public int EpisodeNumber { get; set; }
         public bool IsPublic {  get; set; }
         public string? Transcript { get; set; }
+        public string? EpisodeCoverImg { get; set; }
 
         [ForeignKey("Podcast")]
         public Guid PodcastId { get; set; }

@@ -46,7 +46,7 @@
                                 <small class="ms-auto">Likes <span id="like-count" class="badge">@Model.Episode.EpisodeLikes!.Count()</span></small>
                             </div>
                             <h2 class="mb-2">@Model.Episode.EpisodeTitle</h2>
-                            <h2 class="mb-2">@Model.Episode.Podcast!.PodcastTitle</h2>
+                            <a asp-action="StagingPodcast" asp-route-id="@Model.Episode.PodcastId" class="mb-2"><strong>@Model.Episode.Podcast!.PodcastTitle</strong></a>
                             <p>@Model.Episode.EpisodeDescription</p>
 
                             <div class="audio-player">
@@ -61,7 +61,7 @@
                             <div>
                                 <form asp-action="TogglePublishEpisode" asp-controller="Creators" method="post" id="publishForm">
                                     <input type="hidden" name="id" value="@Model.Episode.EpisodeId" />
-                                    @if (Model.Episode.IsActive)
+                                    @if (Model.Episode.IsPublic)
                                     {
                                         <button type="button" id="toggleButton" class="btn btn-secondary" onclick="togglePublish()">UnPublish</button>
                                     }
@@ -103,25 +103,26 @@
 
 <script>
     function togglePublish() {
-        var isActive = $('#toggleButton').hasClass('btn-success');
+        var isPublic = $('#toggleButton').hasClass('btn-success');
 
         Swal.fire({
-            title: isActive ? 'Publish Episode?' : 'Unpublish Episode?',
-            text: isActive ? "Do you want to publish this Episode?" : "Do you want to unpublish this Episode?",
-            icon: isActive ? 'success' : 'warning',
+            title: isPublic ? 'Publish Episode?' : 'Unpublish Episode?',
+            text: isPublic ? "Do you want to publish this Episode?" : "Do you want to unpublish this Episode?",
+            icon: isPublic ? 'success' : 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: isActive ? 'Yes, publish it!' : 'Yes, unpublish it!'
+            confirmButtonText: isPublic ? 'Yes, publish it!' : 'Yes, unpublish it!'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
                     url: '@Url.Action("TogglePublishEpisode", "Creators")',
                     data: $('#publishForm').serialize(),
+                    type: 'POST',
                     success: function (response) {
                         if (response.success) {
 
-                            if (isActive) {
+                            if (isPublic) {
                                 $('#toggleButton').text('UnPublish').removeClass('btn-success').addClass('btn-secondary');
                                 Swal.fire('Published!', response.message, 'success');
                             } else {
@@ -152,6 +153,10 @@
 
         if (transcribeButton) {
             transcribeButton.addEventListener('click', function () {
+
+                transcriptTextArea.value = "Transcribing... Please wait.";
+                transcriptTextArea.style.display = 'block';
+
                 $.ajax({
                     url: '/CreatorEpisodes/Transcribe', 
                     type: 'POST',
@@ -159,7 +164,6 @@
                         episodeId: episodeId
                     },
                     success: function (response) {
-                        console.log('Transcription result:', response.text);
                         transcriptTextArea.value = response.text; 
                         transcriptTextArea.style.display = 'block'; 
                         saveTranscriptButton.style.display = 'block';
@@ -190,6 +194,49 @@
     });
 
 
+    // audio player
+    $(document).ready(function () {
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const rewindBtn = document.getElementById('rewindBtn');
+        const forwardBtn = document.getElementById('forwardBtn');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const totalTimeDisplay = document.getElementById('totalTime');
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        audioPlayer.addEventListener('loadedmetadata', function () {
+            totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+        });
+
+        audioPlayer.addEventListener('timeupdate', function () {
+            currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+        });
+
+        playPauseBtn.addEventListener('click', function () {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playPauseBtn.textContent = '⏸ Pause';
+            } else {
+                audioPlayer.pause();
+                playPauseBtn.textContent = '▶️ Play';
+            }
+        });
+
+        // Rewind 15 seconds
+        rewindBtn.addEventListener('click', function () {
+            audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 15);
+        });
+
+        // Fast forward 15 seconds
+        forwardBtn.addEventListener('click', function () {
+            audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + 15);
+        });
+    });
 
 
 

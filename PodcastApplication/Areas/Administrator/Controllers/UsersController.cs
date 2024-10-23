@@ -73,5 +73,16 @@ namespace PodcastApplication.Areas.Administrator.Controllers
             }
             return NotFound();
         }
+        public async Task<IActionResult> UserDetails(string id)
+        {
+            var user = await _db.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
     }
 }

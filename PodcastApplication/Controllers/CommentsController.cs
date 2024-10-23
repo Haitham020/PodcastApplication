@@ -14,7 +14,7 @@ public class CommentsController : Controller
     }
 
     [HttpGet]
-    public IActionResult GetComments(Guid episodeId)
+    public IActionResult AllComments(Guid id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if(userId == null)
@@ -24,38 +24,57 @@ public class CommentsController : Controller
 
         var comments = _context.Comments
             .Include(x => x.User)
-            .Where(c => c.EpisodeId == episodeId)
+            .Where(c => c.EpisodeId == id)
             .OrderBy(c => c.CreatedAt)
             .ToList();
 
-        return PartialView("_CommentsList", comments);
+        ViewBag.EpisodeId = id;
+
+        return View(comments);
     }
 
-    // Add comment (already implemented)
     [HttpPost]
-    public IActionResult AddComment(Guid episodeId, string commentText)
+    public async Task<IActionResult> AddComment(Guid id, string commentText)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null)
         {
-            return NoContent();
+            return Unauthorized("You must be logged in to post comments.");
+        }
+
+        if (string.IsNullOrWhiteSpace(commentText))
+        {
+            return BadRequest("Comment text cannot be empty.");
         }
 
         var newComment = new Comment
         {
             UserId = userId,
-            EpisodeId = episodeId,
+            EpisodeId = id,
             CommentText = commentText,
             CreatedAt = DateTime.Now
         };
 
         _context.Comments.Add(newComment);
-        _context.SaveChanges();
-
-        return PartialView("_SingleComment", newComment);
+        try
+        {
+            await _context.SaveChangesAsync();
+            return Ok(new
+            {
+                id = newComment.CommentId,
+                userName = User.Identity!.Name,
+                commentText,
+                createdAt = newComment.CreatedAt.ToString("g") 
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal server error: " + ex.Message);
+        }
+        
     }
 
-    // Edit Comment
+
     [HttpPost]
     public IActionResult EditComment(int commentId, string updatedText)
     {
@@ -72,7 +91,7 @@ public class CommentsController : Controller
         comment.CommentText = updatedText;
         _context.SaveChanges();
 
-        return PartialView("_SingleComment", comment); // Return the updated comment
+        return Ok();
     }
 
     // Delete Comment

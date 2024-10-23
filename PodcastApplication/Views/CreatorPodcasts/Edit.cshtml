@@ -10,24 +10,32 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="All" class="text-danger"></div>
             <input type="hidden" asp-for="PodcastId" />
+            <input type="hidden" asp-for="CreatorId" />
+            <input type="hidden" asp-for="IsActive" />
+            <input type="hidden" asp-for="IsDeleted" />
+            <input type="hidden" asp-for="IsPublic" />
+
+
             <div class="form-group">
                 <label asp-for="PodcastTitle" class="control-label"></label>
-                <input asp-for="PodcastTitle" class="form-control" />
+                <input asp-for="PodcastTitle" class="form-control" required />
                 <span asp-validation-for="PodcastTitle" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="PodcastDescription" class="control-label"></label>
-                <input asp-for="PodcastDescription" class="form-control" />
+                <input asp-for="PodcastDescription" class="form-control" required />
                 <span asp-validation-for="PodcastDescription" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="PodcastCoverImg" class="control-label"></label>
-                <input asp-for="PodcastCoverImg" class="form-control" />
+                <input type="file" name="imgFile" asp-for="PodcastCoverImg" class="form-control" />
                 <span asp-validation-for="PodcastCoverImg" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
                 <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>

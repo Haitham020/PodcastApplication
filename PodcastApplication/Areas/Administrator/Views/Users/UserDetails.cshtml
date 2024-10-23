@@ -1,0 +1,29 @@
+﻿@model ApplicationUser
+
+<h2>User Details</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Username</dt>
+        <dd class="col-sm-10">@Model.UserName</dd>
+
+        <dt class="col-sm-2">Email</dt>
+        <dd class="col-sm-10">@Model.Email</dd>
+        
+        <dd class="col-sm-2">Age</dd>
+        <dd class="col-sm-10">@Model.Age</dd>
+
+        <dd class="col-sm-2">Date Joined</dd>
+        <dd class="col-sm-10">@Model.DateJoined.ToShortDateString()</dd>
+
+        <dd class="col-sm-2">Country</dd>
+        <dd class="col-sm-10">@Model.Country</dd>
+
+        <dd class="col-sm-2">Status</dd>
+        <dd class="col-sm-10">@(Model.Active ? "Active" : "Inactive")</dd>
+
+
+    </dl>
+</div>
+
+<a href="@Url.Action("Index", "Users")" class="btn btn-primary">Back to Users List</a>

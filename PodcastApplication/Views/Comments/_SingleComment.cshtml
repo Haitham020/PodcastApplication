@@ -2,6 +2,7 @@
 @using System.Security.Claims
 
 <div class="comment" id="comment-@Model.CommentId">
+    <h4>@Model.User!.UserName</h4>
     <p class="comment-text">@Model.CommentText</p>
     <small>@Model.CreatedAt.ToString("g")</small>
 

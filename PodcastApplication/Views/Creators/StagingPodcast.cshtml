@@ -1,7 +1,7 @@
 ﻿@model PodcastDetailViewModel
 
 @{
-    ViewData["Title"] = "StagingPodcast";
+    ViewData["Title"] = "Staging Podcast";
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -74,7 +74,7 @@
                             <div>
                                 <form asp-action="TogglePublishPodcast" asp-controller="Creators" method="post" id="publishPodcastForm">
                                     <input type="hidden" name="id" value="@Model.Podcast.PodcastId" />
-                                    @if (Model.Podcast.IsActive)
+                                    @if (Model.Podcast.IsPublic)
                                     {
                                         <button type="button" id="toggleButton" class="btn btn-secondary" onclick="togglePublish()">UnPublish</button>
                                     }
@@ -116,14 +116,10 @@
                                     </a>
                                 </div>
 
-                                <div class="audio-player mt-3">
-                                    <audio controls style="width: 100%;">
-                                        <source src="~/audio/@episode.AudioFile" type="audio/mpeg">
-                                    </audio>
-                                </div>
-
+                               
                                 <div class="mt-2">
-                                    <a href="#" class="btn custom-btn btn-sm w-100">Play</a>
+                                    <a asp-action="StagingEpisode" 
+                                    asp-controller="Creators" asp-route-id="@episode.EpisodeId" class="btn custom-btn btn-sm w-100">Play</a>
                                 </div>
                             </div>
 
@@ -147,14 +143,7 @@
 
                             </div>
 
-                            <div class="d-flex flex-column justify-content-start ms-3">
-                                <a href="#" class="badge bg-secondary mb-2">
-                                    <i class="bi-heart text-light"></i>
-                                </a>
-                                <a href="#" class="badge bg-secondary">
-                                    <i class="bi-bookmark text-light"></i>
-                                </a>
-                            </div>
+                            
                         </div>
                     </div>
                 }
@@ -172,16 +161,16 @@
 
 <script>
     function togglePublish() {
-        var isActive = $('#toggleButton').hasClass('btn-success'); 
+        var isPublic = $('#toggleButton').hasClass('btn-success'); 
 
         Swal.fire({
-            title: isActive ? 'Publish Podcast?' : 'Unpublish Podcast?',
-            text: isActive ? "Do you want to publish this Podcast?" : "Do you want to unpublish this Podcast?",
-            icon: isActive ? 'success' : 'warning',
+            title: isPublic ? 'Publish Podcast?' : 'Unpublish Podcast?',
+            text: isPublic ? "Do you want to publish this Podcast?" : "Do you want to unpublish this Podcast?",
+            icon: isPublic ? 'success' : 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: isActive ? 'Yes, publish it!' : 'Yes, unpublish it!'
+            confirmButtonText: isPublic ? 'Yes, publish it!' : 'Yes, unpublish it!'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -190,7 +179,7 @@
                     data: $('#publishPodcastForm').serialize(),
                     success: function (response) {
                         if (response.success) {
-                            if (isActive) {
+                            if (isPublic) {
                                 $('#toggleButton').text('UnPublish').removeClass('btn-success').addClass('btn-secondary');
                                 Swal.fire('Published!', response.message, 'success');
                             } else {

@@ -11,8 +11,12 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger"></div>
             <input type="hidden" asp-for="EpisodeId" />
+            <input type="hidden" asp-for="IsActive" />
+            <input type="hidden" asp-for="IsDeleted" />
+            <input type="hidden" asp-for="IsPublic" />
+
             <div class="form-group">
                 <label asp-for="EpisodeTitle" class="control-label"></label>
                 <input asp-for="EpisodeTitle" class="form-control" />
@@ -28,6 +32,14 @@
                 <input type="file" asp-for="AudioFile" class="form-control" />
                 <span asp-validation-for="AudioFile" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="EpisodeCoverImg" class="control-label"></label>
+                <input asp-for="EpisodeCoverImg" name="imgFile" type="file" class="form-control" />
+                <span asp-validation-for="EpisodeCoverImg" class="text-danger"></span>
+            </div>
+
+
             <div class="form-group">
                 <label asp-for="EpisodeDuration" class="control-label"></label>
                 <input asp-for="EpisodeDuration" class="form-control" readonly/>
@@ -51,3 +63,47 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+<script>
+    $(document).ready(function () {
+
+        $('#audioFileInput').on('change', function () {
+            var fileInput = this;
+
+            if (fileInput.files && fileInput.files[0]) {
+                var formData = new FormData();
+                formData.append("audioFile", fileInput.files[0]);
+
+
+                $('#loadingIndicator').show();
+
+                $.ajax({
+                    url: '/CreatorEpisodes/GetEpisodeDuration',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $('#loadingIndicator').hide();
+                        if (response.episodeDuration) {
+
+                            $('#EpisodeDuration').val(response.episodeDuration);
+                        } else if (response.error) {
+                            alert(response.error);
+                        }
+                    },
+                    error: function () {
+                        $('#loadingIndicator').hide();
+                        alert("An error occurred while uploading the file.");
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

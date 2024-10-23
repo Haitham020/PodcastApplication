@@ -80,15 +80,14 @@ namespace PodcastApplication.Controllers
             return View();
         }
 
-        // POST: CreatorEpisodes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Episode episode, IFormFile audioFile)
+        public async Task<IActionResult> Create(Episode episode, IFormFile audioFile, IFormFile imgFile)
         {
             if (ModelState.IsValid)
             {
+
                 if (audioFile != null && audioFile.Length > 0)
                 {
                     var extension = Path.GetExtension(audioFile.FileName).ToLower();
@@ -119,9 +118,46 @@ namespace PodcastApplication.Controllers
                 }
 
 
+
+                if (imgFile != null && imgFile.Length > 0)
+                {
+                    var extension = Path.GetExtension(imgFile.FileName).ToLower();
+                    var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".svg" };
+
+
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError("AudioFile", "Invalid file type. Please upload only audio files (mp3, wav, etc.).");
+                        ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastTitle");
+                        return View(episode);
+                    }
+
+                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/episodes");
+
+                    // Check if the directory exists, if not, create it
+                    if (!Directory.Exists(folderPath))
+                    {
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var filePath = Path.Combine(folderPath, imgFile.FileName);
+
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await imgFile.CopyToAsync(stream);
+                    }
+
+                    // Assign the file name to the episode's image property
+                    episode.EpisodeCoverImg = imgFile.FileName;
+
+                }
+
+
+
                 episode.EpisodeNumber = 1;
-                episode.IsActive = false;
-                episode.IsDeleted = true;
+                episode.IsActive = true;
+                episode.IsDeleted = false;
+                episode.IsPublic = false;
                 episode.CreatedAt = DateTime.Now;
 
                 episode.EpisodeId = Guid.NewGuid();
@@ -198,67 +234,96 @@ namespace PodcastApplication.Controllers
             return View(episode);
         }
 
-        // POST: CreatorEpisodes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Episode episode, IFormFile audioFile)
+        public async Task<IActionResult> Edit(Guid id, Episode episode, IFormFile audioFile, IFormFile imgFile)
         {
             if (id != episode.EpisodeId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+
+            var allowedAudioExtensions = new[] { ".mp3", ".wav", ".flac", ".ogg", ".aac" };
+
+            if (audioFile != null && audioFile.Length > 0)
             {
-                try
+                var audioExtension = Path.GetExtension(audioFile.FileName).ToLowerInvariant();
+
+                if (!allowedAudioExtensions.Contains(audioExtension))
                 {
-                    var allowedExtensions = new[] { ".mp3", ".wav", ".flac", ".ogg", ".aac" };
-                    var extension = Path.GetExtension(audioFile.FileName).ToLower();
-
-                    if (!allowedExtensions.Contains(extension))
-                    {
-                        ModelState.AddModelError("AudioFile", "Invalid file type. Please upload only audio files (mp3, wav, etc.).");
-                        ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastTitle");
-                        return View(episode);
-                    }
-
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory(),
-                        "wwwroot/audio", audioFile.FileName);
-                    using (var stream = System.IO.File.Create(filePath))
-                    {
-                        await audioFile.CopyToAsync(stream);
-                    }
-
-                    episode.AudioFile = audioFile.FileName;
-
-                    using (var audioFileReader = new AudioFileReader(filePath))
-                    {
-                        episode.EpisodeDuration = TimeSpan.FromSeconds(Math.Round(audioFileReader.TotalTime.TotalSeconds));
-                    }
-
-
-
-                    _context.Update(episode);
-                    await _context.SaveChangesAsync();
+                    throw new Exception("Invalid audio file type. Please upload only mp3, wav, flac, ogg, or aac files.");
                 }
-                catch (DbUpdateConcurrencyException)
+
+                var audioFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/audio", audioFile.FileName);
+                using (var stream = System.IO.File.Create(audioFilePath))
                 {
-                    if (!EpisodeExists(episode.EpisodeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    await audioFile.CopyToAsync(stream);
                 }
-                return RedirectToAction(nameof(Index));
+
+                episode.AudioFile = audioFile.FileName;
+
+                using (var audioFileReader = new AudioFileReader(audioFilePath))
+                {
+                    episode.EpisodeDuration = TimeSpan.FromSeconds(Math.Round(audioFileReader.TotalTime.TotalSeconds));
+                }
             }
-            ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastTitle");
-            return View(episode);
+            else
+            {
+                episode.AudioFile = _context.Episodes.AsNoTracking()
+                                                       .Where(p => p.EpisodeId == id)
+                                                       .Select(p => p.AudioFile)
+                                                       .FirstOrDefault();
+            }
+
+            var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+
+            if (imgFile != null && imgFile.Length > 0)
+            {
+                var imageExtension = Path.GetExtension(imgFile.FileName).ToLowerInvariant();
+
+                if (!allowedImageExtensions.Contains(imageExtension))
+                {
+                    throw new Exception("Invalid image file type. Please upload only jpg, jpeg, png, or gif files.");
+                }
+
+                var imgFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/episodes", imgFile.FileName);
+                using (var stream = System.IO.File.Create(imgFilePath))
+                {
+                    await imgFile.CopyToAsync(stream);
+                }
+
+                episode.EpisodeCoverImg = imgFile.FileName;
+            }
+            else
+            {
+
+                episode.EpisodeCoverImg = _context.Episodes.AsNoTracking()
+                                   .Where(p => p.EpisodeId == id)
+                                   .Select(p => p.EpisodeCoverImg)
+                                   .FirstOrDefault();
+
+            }
+            try
+            {
+               
+                episode.CreatedAt = DateTime.Now;
+
+                _context.Update(episode);
+                await _context.SaveChangesAsync();
+
+
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastTitle");
+                return View(episode);
+            }
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: CreatorEpisodes/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
@@ -344,7 +409,7 @@ namespace PodcastApplication.Controllers
                 }
             }
 
-            episode.Transcript = transcript.Text; 
+            episode.Transcript = transcript.Text;
             _context.Episodes.Update(episode);
             await _context.SaveChangesAsync();
 
@@ -364,7 +429,9 @@ namespace PodcastApplication.Controllers
 
             return Ok();
         }
-
-
+        public IActionResult Recorder()
+        {
+            return View();
+        }
     }
 }

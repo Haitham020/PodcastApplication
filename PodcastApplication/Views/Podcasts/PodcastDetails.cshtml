@@ -222,14 +222,9 @@
                                     </a>
                                 </div>
 
-                                <div class="audio-player mt-3">
-                                    <audio controls style="width: 100%;">
-                                        <source src="~/audio/@episode.AudioFile" type="audio/mpeg">
-                                    </audio>
-                                </div>
-
                                 <div class="mt-2">
-                                    <a href="#" class="btn custom-btn btn-sm w-100">Play</a>
+                                    <a asp-action="EpisodeDetails" asp-controller="Episodes"
+                                       asp-route-id="@episode.EpisodeId" class="btn custom-btn btn-sm w-100">Play</a>
                                 </div>
                             </div>
 
