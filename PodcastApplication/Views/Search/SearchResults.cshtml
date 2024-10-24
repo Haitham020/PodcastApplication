@@ -1,40 +1,313 @@
 ﻿@model SearchViewModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> _userManager
 
 @{
     ViewData["Title"] = "Searched Results";
 }
 
+<style>
+
+    .playlist-card {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
 
 
-@if (Model.Podcasts!.Any())
-{
-    <h3>Podcasts</h3>
-    <ul>
-        @foreach (var podcast in Model.Podcasts!)
-        {
-            <li>@podcast.PodcastTitle</li>
+
+    .playlist-img-wrap {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .playlist-img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .playlist-card:hover .playlist-img {
+        transform: scale(1.1);
+    }
+
+    .playlist-content {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .playlist-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .playlist-creator {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .section-title-wrap {
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .section-description {
+        font-size: 1.1rem;
+        color: #777;
+        margin-bottom: 40px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
         }
-    </ul>
+
+    
+
+</style>
+
+@if (Model.Podcasts!.Any() && Model.Podcasts != null)
+{
+    <section class="trending-podcast-section section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-12">
+                    <div class="section-title-wrap mb-5">
+                        <h4 class="section-title">All Podcasts</h4>
+                    </div>
+                </div>
+
+                @foreach (var podcast in Model.Podcasts)
+                {
+                    var ratingCount = podcast.Ratings?.Count() ?? 0;
+                    var averageRating = ratingCount > 0 ? podcast.Ratings!.Average(r => r.RatingValue) : 0;
+
+                    <div class="col-lg-4 col-12 mb-4">
+                        <div class="custom-block custom-block-full mb-4">
+                            <div class="custom-block-image-wrap">
+                                <a href="detail-page.html">
+                                    <img src="~/images/podcast/@podcast.PodcastCoverImg" class="custom-block-image img-fluid" alt="">
+                                </a>
+                            </div>
+
+                            <div class="custom-block-info">
+                                <h5 class="mb-2">
+                                    <a asp-action="PodcastDetails" asp-controller="Podcasts"
+                                       asp-route-id="@podcast.PodcastId">
+                                        @podcast.PodcastTitle
+                                    </a>
+                                </h5>
+
+                                <div class="profile-block d-flex">
+                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <p>
+                                        @podcast.Creator!.UserName
+                                        <strong>@podcast.Creator.CreatorGenre</strong>
+                                    </p>
+                                </div>
+
+                                <p class="mb-0">@podcast.PodcastDescription</p>
+
+                                <div class="custom-block-bottom d-flex justify-content-between mt-3">
+                                    <a href="#" class="bi-heart me-1">
+                                        <span>@podcast.Subscriptions!.Count() Followers</span>
+                                    </a>
+
+                                    <!-- Ratings with clickable icon -->
+                                    <a href="#" class="bi-star me-1 rating-icon">
+                                        <span>@averageRating.ToString("F1") stars</span>
+                                    </a>
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
 }
 
-@if (Model.Episodes!.Any())
+@if (Model.Episodes!.Any() && Model.Episodes != null)
 {
-    <h3>Episodes</h3>
-    <ul>
-        @foreach (var episode in Model.Episodes!)
-        {
-            <li>@episode.EpisodeTitle</li>
-        }
-    </ul>
+    <section class="latest-podcast-section section-padding pb-0" id="section_2">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-12 col-12">
+                    <div class="section-title-wrap mb-5">
+                        <h4 class="section-title">Lastest episodes</h4>
+                    </div>
+                </div>
+                @foreach (var episode in Model.Episodes)
+                {
+
+
+                    <div class="col-lg-6 col-12 mb-4 mb-lg-0">
+                        <div class="custom-block d-flex">
+                            <div class="">
+                                <div class="custom-block-icon-wrap">
+                                    <div class="section-overlay"></div>
+                                    <a class="custom-block-image-wrap">
+                                        <img src="~/images/episodes/@episode.EpisodeCoverImg" class="custom-block-image img-fluid" alt="">
+
+
+                                    </a>
+                                </div>
+
+
+                            </div>
+
+                            <div class="custom-block-info">
+                                <div class="custom-block-top d-flex mb-1">
+                                    <small class="me-4">
+                                        <i class="bi-clock-fill custom-icon"></i>
+                                        @episode.EpisodeDuration
+                                    </small>
+
+                                    <small class="badge"> episode @episode.EpisodeNumber of<span>  @episode.Podcast!.Episodes!.Count()</span></small>
+                                </div>
+
+                                <h5 class="mb-2">
+                                    <a asp-action="EpisodeDetails" asp-controller="Episodes"
+                                       asp-route-id="@episode.EpisodeId">
+                                        @episode.EpisodeTitle  | @episode.Podcast.PodcastTitle
+                                    </a>
+                                </h5>
+
+                                <div class="profile-block d-flex">
+                                    <img src="~/images/episodes/@episode.EpisodeCoverImg" class="profile-block-image img-fluid" alt="">
+
+                                    
+                                </div>
+
+                                <p class="mb-0">@episode.EpisodeDescription</p>
+
+                                <div class="custom-block-bottom d-flex justify-content-between mt-3">
+                                    <a href="#" class="bi-headphones me-1">
+                                        <span>@(episode.EpisodeListeners?.Count() ?? 0)</span>
+                                    </a>
+
+                                    <a href="#" class="bi-heart me-1">
+                                        <span>@(episode.EpisodeLikes?.Count() ?? 0)</span>
+                                    </a>
+
+                                    <a href="#" class="bi-chat me-1">
+                                        <span>@(episode.Comments?.Count() ?? 0)</span>
+                                    </a>
+
+                                    <a href="#" class="bi-download">
+                                        <span>0</span>
+                                    </a>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
 }
 
-@if (Model.Categories!.Any())
+
+
+@if (Model.Categories!.Any() && Model.Categories != null)
 {
-    <h3>Categories</h3>
-    <ul>
-        @foreach (var category in Model.Categories!)
-        {
-            <li>@category.CategoryName</li>
-        }
-    </ul>
+    <section class="topics-section section-padding pb-0" id="section_3">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-lg-12 col-12">
+                    <div class="section-title-wrap mb-5">
+                        <h4 class="section-title">Podcast Categories</h4>
+                    </div>
+                </div>
+                @foreach (var category in Model.Categories)
+                {
+                    <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0">
+                        <div class="custom-block custom-block-overlay">
+                            <a href="#"
+                               class="custom-block-image-wrap">
+                                <img src="~/images/topics/@category.CategoryImg" class="custom-block-image img-fluid" alt="">
+                            </a>
+
+                            <div class="custom-block-info custom-block-overlay-info">
+                                <h5 class="mb-1">
+                                    <a asp-action="CategoryPodcasts" asp-controller="Categories"
+                                       asp-route-id="@category.CategoryId">
+                                        @category.CategoryName
+                                    </a>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+
+            </div>
+        </div>
+    </section>
+
 }
+
+@if (Model.Playlists!.Any() && Model.Playlists != null)
+{
+    <section class="public-playlists-section py-5">
+        <div class="container">
+            <div class="section-title-wrap mb-5 text-center">
+                <h2 class="section-title">Public Playlists</h2>
+                <p class="section-description">Explore the top public playlists curated by users. Click on a playlist to view its saved items.</p>
+            </div>
+
+
+            <div class="row">
+                @foreach (var playlist in Model.Playlists)
+                {
+                    var userId = _userManager.GetUserId(User);
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="playlist-card shadow-sm">
+                            <div class="playlist-img-wrap">
+                                <img src="@playlist.PlaylistImg" class="playlist-img img-fluid rounded" alt="Playlist Image">
+                            </div>
+                            <div class="playlist-content p-3">
+                                <h3 class="playlist-name mb-2">@playlist.PlaylistName</h3>
+                                <p class="playlist-creator text-muted">by @playlist.User!.UserName</p>
+
+                                <a asp-action="SavedItemsInPlaylist" asp-controller="Playlists"
+                                   asp-route-playlistId="@playlist.PlaylistId"
+                                   class="btn btn-primary btn-sm mt-3 w-100">
+                                    Go to Playlist
+                                </a>
+                            </div>
+                       
+                        </div>
+                    </div>
+                }
+            </div>        
+        </div>
+    </section>
+
+    
+}
+
+

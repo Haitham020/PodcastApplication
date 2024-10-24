@@ -1,17 +1,19 @@
 ﻿@model IEnumerable<PodcastApplication.Models.Episode>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Episodes";
 }
 
-<h1>Index</h1>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
 <p>
     <a asp-action="Create"><strong>Create New Episode</strong></a> |
-    <a asp-action="Recorder"><strong>Built-In Recorder</strong></a>
+    <a asp-action="Recorder"><strong>Built-In Recorder</strong></a> |
+    <a asp-action="DeletedEpisodes" asp-controller="CreatorEpisodes"><strong>Restore Episodes</strong></a>
+
 </p>
 
-@if(!Model.Any())
+@if (!Model.Any())
 {
     <div class="alert alert-warning">
         No episodes available. Please create a new episode.
@@ -34,11 +36,9 @@ else
                     @Html.DisplayNameFor(model => model.Podcast)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.IsActive)
+                    @Html.DisplayNameFor(model => model.IsPublic)
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IsDeleted)
-                </th>
+              
 
                 <th></th>
             </tr>
@@ -59,16 +59,17 @@ else
                         @Html.DisplayFor(modelItem => item.Podcast!.PodcastTitle)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.IsActive)
+                        @Html.DisplayFor(modelItem => item.IsPublic)
                     </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.IsDeleted)
-                    </td>
+                  
 
                     <td>
                         <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.EpisodeId">Edit</a> |
                         <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.EpisodeId">Details</a> |
-                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.EpisodeId">Delete</a> |
+                        <form asp-action="Delete" asp-route-id="@item.EpisodeId" method="post" style="display:inline;" id="deleteForm-@item.EpisodeId">
+                            @Html.AntiForgeryToken()
+                            <button type="button" class="btn btn-danger" onclick="confirmDelete('@item.EpisodeId')">Delete</button>
+                        </form> |
                         <a asp-action="StagingPodcast" asp-controller="Creators" asp-route-id="@item.PodcastId"><strong>Go to podcast</strong></a>
 
                     </td>
@@ -78,3 +79,22 @@ else
     </table>
 }
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function confirmDelete(episodeId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(`deleteForm-${episodeId}`).submit();
+            }
+        })
+        }
+</script>

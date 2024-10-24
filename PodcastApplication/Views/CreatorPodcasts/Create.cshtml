@@ -11,20 +11,20 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="PodcastTitle" class="control-label"></label>
+                <label asp-for="PodcastTitle" class="control-label">Title</label>
                 <input asp-for="PodcastTitle" class="form-control" required/>
                 <span asp-validation-for="PodcastTitle" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PodcastDescription" class="control-label"></label>
+                <label asp-for="PodcastDescription" class="control-label">Description</label>
                 <input asp-for="PodcastDescription" class="form-control" required />
                 <span asp-validation-for="PodcastDescription" class="text-danger"></span>
             </div>
             
             <div class="form-group">
-                <label asp-for="PodcastCoverImg" class="control-label"></label>
+                <label asp-for="PodcastCoverImg" class="control-label">Cover Image</label>
                 <input type="file" name="imgFile" asp-for="PodcastCoverImg" class="form-control" required />
                 <span asp-validation-for="PodcastCoverImg" class="text-danger"></span>
             </div>

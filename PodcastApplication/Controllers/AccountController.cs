@@ -130,6 +130,36 @@ namespace PodcastApplication.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        public IActionResult Creators()
+        {
+            var creators = _userManager
+                .GetUsersInRoleAsync("Creator")
+                .Result
+                .ToList();
+            var activeCreators = creators
+                .Where(c => c.Active)
+                .ToList();
+
+            return View(activeCreators);
+        }
+        [HttpGet]
+        public async Task<IActionResult> CreatorDetails(string id)
+        {
+            if(id == null)
+            {
+                return NotFound();
+            }
+            var creator = await _userManager.FindByIdAsync(id);
+            if(creator == null)
+            {
+                return NotFound();
+            }
+
+            return View(creator);
+
+        }
     }
 
 }

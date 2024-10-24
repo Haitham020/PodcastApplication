@@ -213,27 +213,8 @@ namespace PodcastApplication.Controllers
         }
 
 
-        // GET: CreatorPodcasts/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+      
 
-            var podcast = await _context.Podcasts
-                .Include(p => p.Category)
-                .Include(p => p.Creator)
-                .FirstOrDefaultAsync(m => m.PodcastId == id);
-            if (podcast == null)
-            {
-                return NotFound();
-            }
-
-            return View(podcast);
-        }
-
-        // POST: CreatorPodcasts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
@@ -251,6 +232,7 @@ namespace PodcastApplication.Controllers
                 {
                     episode.IsDeleted = true;
                     episode.IsActive = false;
+                    episode.IsPublic = false;
                 }
 
                 await _context.SaveChangesAsync();
@@ -262,6 +244,47 @@ namespace PodcastApplication.Controllers
         private bool PodcastExists(Guid id)
         {
             return _context.Podcasts.Any(e => e.PodcastId == id);
+        }
+        public async Task<IActionResult> DeletedPodcasts()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var appDbContext = _context.Podcasts
+                .Include(p => p.Category)
+                .Include(p => p.Creator)
+                .Where(x => x.CreatorId == userId && x.IsDeleted)
+                .OrderBy(x => x.CreatedAt);
+
+            return View(await appDbContext.ToListAsync());
+        }
+        [HttpPost]
+        public async Task<IActionResult> RestorePodcast(Guid id)
+        {
+            var podcast = await _context.Podcasts
+                .Include(p => p.Episodes)
+                .FirstOrDefaultAsync(p => p.PodcastId == id);
+
+            if (podcast != null)
+            {
+                podcast.IsActive = true;
+                podcast.IsDeleted = false;
+
+                foreach (var episode in podcast.Episodes!)
+                {
+                    episode.IsDeleted = false;
+                    episode.IsActive = true;
+                    episode.IsPublic = false;
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+
         }
     }
 }

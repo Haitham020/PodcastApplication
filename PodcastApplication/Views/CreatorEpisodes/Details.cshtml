@@ -1,72 +1,67 @@
 ﻿@model PodcastApplication.Models.Episode
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Episode Details";
 }
 
-<h1>Details</h1>
+<h1 class="text-center mb-4">@Model.EpisodeTitle</h1>
 
-<div>
-    <h4>Episode</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EpisodeTitle)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EpisodeTitle)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EpisodeDescription)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EpisodeDescription)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AudioFile)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AudioFile)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EpisodeDuration)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EpisodeDuration)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EpisodeNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EpisodeNumber)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Podcast)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Podcast.PodcastId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsActive)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsActive)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsDeleted)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsDeleted)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-    </dl>
+<div class="card mb-4">
+    <div class="row g-0">
+        <!-- Episode Details -->
+        <div class="col-md-12">
+            <div class="card-body">
+                <h4 class="card-title">Episode Details</h4>
+                <hr />
+                <dl class="row">
+                    <dt class="col-sm-4">Title</dt>
+                    <dd class="col-sm-8">@Model.EpisodeTitle</dd>
+
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">@Model.EpisodeDescription</dd>
+
+                    <dt class="col-sm-4">Audio File</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.AudioFile))
+                        {
+                            <audio controls>
+                                <source src="~/audio/@Model.AudioFile" type="audio/mpeg">
+                            </audio>
+                        }
+                        else
+                        {
+                            <span>No audio file available</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Duration</dt>
+                    <dd class="col-sm-8">@Model.EpisodeDuration</dd>
+
+                    <dt class="col-sm-4">Episode Number</dt>
+                    <dd class="col-sm-8">@Model.EpisodeNumber</dd>
+
+                    <dt class="col-sm-4">Podcast</dt>
+                    <dd class="col-sm-8">@Model.Podcast?.PodcastTitle</dd>
+
+                    <dt class="col-sm-4">Public</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge @((Model.IsPublic) ? "bg-success" : "bg-danger")">
+                            @(Model.IsPublic ? "Public" : "Not Public")
+                        </span>
+                    </dd>
+
+                   
+
+                    <dt class="col-sm-4">Created At</dt>
+                    <dd class="col-sm-8">@Model.CreatedAt.ToString("MMMM dd, yyyy")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.EpisodeId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<!-- Buttons -->
+<div class="text-center mt-4">
+    <a asp-action="Edit" asp-route-id="@Model.EpisodeId" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>

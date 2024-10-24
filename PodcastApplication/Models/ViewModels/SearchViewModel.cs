@@ -5,5 +5,6 @@
         public ICollection<Category>? Categories { get; set; }
         public ICollection<Podcast>? Podcasts { get; set; }
         public ICollection<Episode>? Episodes { get; set; }
+        public ICollection<Playlist>? Playlists { get; set; }
     }
 }

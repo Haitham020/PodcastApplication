@@ -4,6 +4,15 @@
     ViewData["Title"] = "About";
 }
 
+<style>
+    .about-image {
+        height: 300px;
+        width: 260px;
+        object-fit: cover;
+    }
+
+</style>
+
 
 
 <section class="about-section section-padding" id="section_2">
@@ -13,12 +22,11 @@
             <div class="col-lg-8 col-12 mx-auto">
                 <div class="pb-5 mb-5">
                     <div class="section-title-wrap mb-4">
-                        <h4 class="section-title">Our story</h4>
+                        <h4 class="section-title">About PodTalk</h4>
                     </div>
 
-                    <p>Pod Talk HTML CSS Template is made by Bootstrap v5.2.2 framework. You are allowed to modify and use this template for your business websites.</p>
+                    <p>Pod Talk is a dynamic podcast application designed to connect creators and listeners in an engaging audio experience. Our platform allows users to discover, create, and share podcasts effortlessly. With features like personalized playlists, real-time episode updates, and community interactions, Pod Talk enhances the way you enjoy and engage with audio content. Join us in exploring a diverse range of topics, connecting with creators, and discovering new voices in the podcasting world.</p>
 
-                    <p>You are not allowed to redistribute the downloadable template ZIP file on any other website without a permission. Please contact TemplateMo website for further information. Thank you.</p>
 
                     <img src="~/images/medium-shot-young-people-recording-podcast.jpg" class="about-image mt-5 img-fluid" alt="">
                 </div>
@@ -33,7 +41,7 @@
             {
                 <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0">
                     <div class="team-thumb bg-white shadow-lg">
-                        <img src="~/images/profile/man-portrait.jpg" class="about-image img-fluid" alt="">
+                        <img src="~/images/profile/@(string.IsNullOrEmpty(user.ProfileImg) ? "userImg.png" : user.ProfileImg)" class="about-image img-fluid" alt="">
 
                         <div class="team-info">
                             <h4 class="mb-2">

@@ -41,7 +41,7 @@ namespace PodcastApplication.Controllers
 
             var appDbContext = _context.Episodes
                 .Include(e => e.Podcast)
-                .Where(x => x.Podcast!.CreatorId == userId);
+                .Where(x => x.Podcast!.CreatorId == userId && x.IsActive);
 
             return View(await appDbContext.ToListAsync());
         }
@@ -324,26 +324,7 @@ namespace PodcastApplication.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        // GET: CreatorEpisodes/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var episode = await _context.Episodes
-                .Include(e => e.Podcast)
-                .FirstOrDefaultAsync(m => m.EpisodeId == id);
-            if (episode == null)
-            {
-                return NotFound();
-            }
-
-            return View(episode);
-        }
-
+    
         // POST: CreatorEpisodes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -432,6 +413,40 @@ namespace PodcastApplication.Controllers
         public IActionResult Recorder()
         {
             return View();
+        }
+        public async Task<IActionResult> DeletedEpisodes()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var appDbContext = _context.Episodes
+                .Include(p => p.Podcast)
+                .Where(x => x.Podcast!.CreatorId == userId && x.IsDeleted)
+                .OrderBy(x => x.CreatedAt);
+
+            return View(await appDbContext.ToListAsync());
+        }
+        [HttpPost]
+        public async Task<IActionResult> RestoreEpisode(Guid id)
+        {
+            var episode = await _context.Episodes.FindAsync(id);
+            if (episode != null && episode.Podcast!.IsActive)
+            {
+                episode.IsActive = true;
+                episode.IsDeleted = false;
+                episode.IsPublic = false;
+            }
+            else
+            {
+                return View(episode);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
         }
     }
 }

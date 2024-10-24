@@ -270,6 +270,5 @@ namespace PodcastApplication.Controllers
             }
             return RedirectToAction("CreatorProfile", "Creators");
         }
-
     }
 }

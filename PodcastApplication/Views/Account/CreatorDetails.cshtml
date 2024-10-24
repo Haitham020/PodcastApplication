@@ -1,0 +1,160 @@
+﻿@model ApplicationUser
+
+@{
+    ViewData["Title"] = "CreatorDetails";
+}
+
+<style>
+    .about-image {
+        height: 400px;
+        width: 300px;
+        object-fit: cover;
+    }
+
+    .team-thumb {
+        width: 100%; 
+        max-width: 350px; 
+        padding: 20px; 
+        border-radius: 10px;
+        background-color: white;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+        margin: auto;
+    }
+
+    .team-info {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .creator-info {
+        margin-top: 20px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .podcast-item {
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .podcast-cover {
+        height: 100px;
+        width: 100px;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+
+    .podcast-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .podcast-description {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .social-share {
+        margin-top: 10px;
+    }
+</style>
+
+<section class="about-section section-padding" id="section_2">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-12 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">Creator Details</h4>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-0">
+                <div class="team-thumb bg-white shadow-lg">
+                    <img src="~/images/profile/@(string.IsNullOrEmpty(Model.ProfileImg) ? "userImg.png" : Model.ProfileImg)" class="about-image img-fluid" alt="">
+
+                    <div class="team-info">
+                        <h4 class="mb-2">
+                            @Model.UserName
+                            <img src="~/images/verified.png" class="verified-image img-fluid" alt="Verified">
+                        </h4>
+
+                        <span class="badge">@Model.CreatorGenre</span>
+
+                        <!-- Creator's bio or additional information -->
+                        <p class="creator-info">
+                            @if (!string.IsNullOrEmpty(Model.ProfileBio))
+                            {
+                                @Model.ProfileBio
+                            }
+                            else
+                            {
+                                <em>No bio available.</em>
+                            }
+                        </p>
+
+                        
+                    </div>
+
+                    <!-- Social media links -->
+                    <div class="social-share">
+                        <ul class="social-icon">
+                            <li class="social-icon-item">
+                                <a href="#" class="social-icon-link bi-twitter"></a>
+                            </li>
+
+                            <li class="social-icon-item">
+                                <a href="#" class="social-icon-link bi-facebook"></a>
+                            </li>
+
+                            <li class="social-icon-item">
+                                <a href="#" class="social-icon-link bi-pinterest"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Creator's Podcasts -->
+            <div class="col-lg-8 col-12">
+                <div class="section-title-wrap mb-5">
+                    <h4 class="section-title">Podcasts by @Model.UserName</h4>
+                </div>
+
+                @if (Model.Podcasts != null && Model.Podcasts.Any())
+                {
+                    <div class="row">
+                        @foreach (var podcast in Model.Podcasts)
+                        {
+                            <div class="col-lg-12 podcast-item">
+                                <div class="d-flex align-items-center">
+                                    <img src="~/images/podcasts/@(string.IsNullOrEmpty(podcast.PodcastCoverImg) ? "defaultPodcast.png" : podcast.PodcastCoverImg)" class="podcast-cover" alt="Podcast cover">
+
+                                    <div>
+                                        <h5 class="podcast-title">@podcast.PodcastTitle</h5>
+                                        <p class="podcast-description">@podcast.PodcastDescription</p>
+                                        <a asp-action="PodcastDetails" asp-controller="Podcasts" asp-route-id="@podcast.PodcastId" class="btn btn-primary btn-sm">View Podcast</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>No podcasts available.</p>
+                }
+            </div>
+            <a asp-action="Creators" asp-controller="Account">
+                <strong>Return</strong>
+            </a>
+
+        </div>
+    </div>
+</section>

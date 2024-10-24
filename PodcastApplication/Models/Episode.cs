@@ -1,13 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PodcastApplication.Models
 {
     public class Episode : SharedProperties
     {
+        [Key]
         public Guid EpisodeId { get; set; }
+
+        [Required(ErrorMessage = "Episode title is required")]
+        [MaxLength(200, ErrorMessage = "Episode title cannot exceed 200 characters")]
         public string? EpisodeTitle { get; set; }
+
+        [Required(ErrorMessage = "Episode description is required")]
+        [MaxLength(1000, ErrorMessage = "Episode description cannot exceed 1000 characters")]
         public string? EpisodeDescription { get; set; }
+
         public string? AudioFile { get; set; }
+
         public TimeSpan EpisodeDuration { get; set; }
         public int EpisodeNumber { get; set; }
         public bool IsPublic {  get; set; }

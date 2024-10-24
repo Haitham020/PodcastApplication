@@ -18,7 +18,13 @@ namespace PodcastApplication.ViewComponents
         }
         public IViewComponentResult Invoke()
         {
-            return View(userManager.GetUsersInRoleAsync("Creator").Result.ToList());
+            var creators = userManager
+                .GetUsersInRoleAsync("Creator")
+                .Result
+                .ToList();
+            var activeCreators = creators.Where(c => c.Active).ToList();
+
+            return View(activeCreators);
         }
     }
 }

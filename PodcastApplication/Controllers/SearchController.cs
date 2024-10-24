@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodcastApplication.Data;
+using PodcastApplication.Models;
 using PodcastApplication.Models.ViewModels;
+using System.Linq;
 
 namespace PodcastApplication.Controllers
 {
     public class SearchController : Controller
     {
         private readonly AppDbContext _context;
+
 
         public SearchController(AppDbContext context)
         {
@@ -18,26 +22,36 @@ namespace PodcastApplication.Controllers
         {
             if (string.IsNullOrEmpty(query))
             {
-                return View(); 
+                return NoContent();
             }
 
             var podcasts = await _context.Podcasts
-                .Where(p => p.PodcastTitle!.Contains(query))
+                .Where(p => p.IsPublic && (p.PodcastTitle!.StartsWith(query) && p.PodcastTitle.Contains(query)))
+                .AsNoTracking()
                 .ToListAsync();
 
             var episodes = await _context.Episodes
-                .Where(e => e.EpisodeTitle!.Contains(query))
+                .Where(e => e.IsPublic && (e.EpisodeTitle!.StartsWith(query) && e.EpisodeTitle.Contains(query)))
+                .AsNoTracking()
                 .ToListAsync();
 
             var categories = await _context.Categories
-                .Where(c => c.CategoryName!.Contains(query))
+                .Where(c => c.IsActive && (c.CategoryName!.StartsWith(query) && c.CategoryName.Contains(query)))
+                .AsNoTracking()
                 .ToListAsync();
 
+            var playlists = await _context.Playlists
+                .Where(c => c.IsPublic && (c.PlaylistName!.StartsWith(query) && c.PlaylistName.Contains(query)))
+                .AsNoTracking()
+                .ToListAsync();
+
+           
             SearchViewModel searchResults = new SearchViewModel
             {
                 Podcasts = podcasts,
                 Episodes = episodes,
-                Categories = categories
+                Categories = categories,
+                Playlists = playlists
             };
 
             return View("SearchResults", searchResults); 
@@ -66,7 +80,14 @@ namespace PodcastApplication.Controllers
                 .Select(c => c.CategoryName)
                 .ToListAsync();
 
-            var allSuggestions = podcastSuggestions.Concat(episodeSuggestions).Concat(categorySuggestions);
+            var playlistSuggestions = await _context.Playlists
+                .Include(x => x.User)
+                .Where(c => c.PlaylistName!.StartsWith(query))
+                .Select(c => c.PlaylistName)
+                .ToListAsync();
+
+
+            var allSuggestions = podcastSuggestions.Concat(episodeSuggestions).Concat(categorySuggestions).Concat(playlistSuggestions);
 
             return PartialView("_Suggestions", allSuggestions);
         }

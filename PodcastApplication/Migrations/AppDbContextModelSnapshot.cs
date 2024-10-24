@@ -256,6 +256,7 @@ namespace PodcastApplication.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CategoryName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -323,7 +324,9 @@ namespace PodcastApplication.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EpisodeDescription")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<TimeSpan>("EpisodeDuration")
                         .HasColumnType("time");
@@ -332,7 +335,9 @@ namespace PodcastApplication.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("EpisodeTitle")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -559,10 +564,14 @@ namespace PodcastApplication.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PodcastDescription")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("PodcastTitle")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("PodcastId");
 
