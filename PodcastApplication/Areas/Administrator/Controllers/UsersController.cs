@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodcastApplication.Areas.Administrator.Models.ViewModels;
@@ -9,24 +10,37 @@ using System.Security.Claims;
 namespace PodcastApplication.Areas.Administrator.Controllers
 {
     [Area("Administrator")]
+    [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private UserManager<ApplicationUser> _userManager;
-        private SignInManager<ApplicationUser> _signInManager;
+
         private AppDbContext _db;
 
         public UsersController(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, AppDbContext db
+            AppDbContext db
             )
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _db = db;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _userManager.Users.ToListAsync());
+            var users = _userManager.Users.ToList();
+            var userRolesViewModel = new List<UsersViewModel>();
+
+            foreach (var user in users)
+            {
+                var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                userRolesViewModel.Add(new UsersViewModel
+                {
+                    User = user,
+                    Role = role
+                });
+            }
+
+            return View(userRolesViewModel);
         }
 
         [HttpPost]

@@ -2,7 +2,7 @@
 
 <style>
     .owl-carousel-image {
-        height: 300px;
+        height: 350px;
         width: 194px;
         object-fit: cover;
     }
@@ -19,7 +19,9 @@
 
             <div class="owl-carousel-info">
                 <h4 class="mb-2">
-                    @creator.UserName
+                    <a asp-action="CreatorDetails"
+                       asp-controller="Account"
+                       asp-route-id="@creator.Id">@creator.UserName</a>
                     <img src="~/images/verified.png" class="owl-carousel-verified-image img-fluid" alt="">
                 </h4>
 

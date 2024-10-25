@@ -101,6 +101,9 @@
             <div class="col-lg-12 col-12">
                 <div class="section-title-wrap mb-5 text-center">
                     <h4 class="section-title">@Model.Podcast.PodcastTitle episodes</h4>
+                    <br />
+                    <a asp-action="Create"
+                       asp-controller="CreatorEpisodes"><strong>Create new Episode</strong></a>
                 </div>
             </div>
             @if (Model.Episodes != null && Model.Episodes.Any())
@@ -116,10 +119,10 @@
                                     </a>
                                 </div>
 
-                               
+
                                 <div class="mt-2">
-                                    <a asp-action="StagingEpisode" 
-                                    asp-controller="Creators" asp-route-id="@episode.EpisodeId" class="btn custom-btn btn-sm w-100">Play</a>
+                                    <a asp-action="StagingEpisode"
+                                       asp-controller="Creators" asp-route-id="@episode.EpisodeId" class="btn custom-btn btn-sm w-100">Play</a>
                                 </div>
                             </div>
 
@@ -143,7 +146,7 @@
 
                             </div>
 
-                            
+
                         </div>
                     </div>
                 }
@@ -161,7 +164,7 @@
 
 <script>
     function togglePublish() {
-        var isPublic = $('#toggleButton').hasClass('btn-success'); 
+        var isPublic = $('#toggleButton').hasClass('btn-success');
 
         Swal.fire({
             title: isPublic ? 'Publish Podcast?' : 'Unpublish Podcast?',
@@ -174,7 +177,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '@Url.Action("TogglePublishPodcast", "Creators")', 
+                    url: '@Url.Action("TogglePublishPodcast", "Creators")',
                     type: 'POST',
                     data: $('#publishPodcastForm').serialize(),
                     success: function (response) {

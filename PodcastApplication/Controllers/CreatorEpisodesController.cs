@@ -15,6 +15,7 @@ using AssemblyAI.Transcripts;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
+using System.Diagnostics;
 
 namespace PodcastApplication.Controllers
 {
@@ -74,7 +75,7 @@ namespace PodcastApplication.Controllers
                 return Unauthorized();
             }
             var creatorPodcasts = _context.Podcasts
-                .Where(x => x.CreatorId == userId);
+                .Where(x => x.CreatorId == userId && x.IsActive);
 
             ViewData["PodcastId"] = new SelectList(creatorPodcasts, "PodcastId", "PodcastTitle");
             return View();
@@ -85,6 +86,12 @@ namespace PodcastApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Episode episode, IFormFile audioFile, IFormFile imgFile)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
             if (ModelState.IsValid)
             {
 
@@ -134,7 +141,6 @@ namespace PodcastApplication.Controllers
 
                     var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/episodes");
 
-                    // Check if the directory exists, if not, create it
                     if (!Directory.Exists(folderPath))
                     {
                         Directory.CreateDirectory(folderPath);
@@ -147,7 +153,6 @@ namespace PodcastApplication.Controllers
                         await imgFile.CopyToAsync(stream);
                     }
 
-                    // Assign the file name to the episode's image property
                     episode.EpisodeCoverImg = imgFile.FileName;
 
                 }
@@ -165,7 +170,11 @@ namespace PodcastApplication.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastTitle");
+
+            var creatorPodcasts = _context.Podcasts
+                            .Where(x => x.CreatorId == userId && x.IsActive);
+
+            ViewData["PodcastId"] = new SelectList(creatorPodcasts, "PodcastId", "PodcastTitle"); 
             return View(episode);
         }
 
@@ -220,6 +229,11 @@ namespace PodcastApplication.Controllers
 
         public async Task<IActionResult> Edit(Guid? id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
             if (id == null)
             {
                 return NotFound();
@@ -230,7 +244,12 @@ namespace PodcastApplication.Controllers
             {
                 return NotFound();
             }
-            ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastTitle");
+
+            var creatorPodcasts = _context.Podcasts
+                           .Where(x => x.CreatorId == userId && x.IsActive);
+
+            ViewData["PodcastId"] = new SelectList(creatorPodcasts, "PodcastId", "PodcastTitle");
+            
             return View(episode);
         }
 
@@ -239,6 +258,13 @@ namespace PodcastApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, Episode episode, IFormFile audioFile, IFormFile imgFile)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+
             if (id != episode.EpisodeId)
             {
                 return NotFound();
@@ -318,7 +344,11 @@ namespace PodcastApplication.Controllers
             catch (Exception ex)
             {
                 ViewBag.ErrorMessage = ex.Message;
-                ViewData["PodcastId"] = new SelectList(_context.Podcasts, "PodcastId", "PodcastTitle");
+
+                var creatorPodcasts = _context.Podcasts
+                           .Where(x => x.CreatorId == userId && x.IsActive);
+
+                ViewData["PodcastId"] = new SelectList(creatorPodcasts, "PodcastId", "PodcastTitle");
                 return View(episode);
             }
             return RedirectToAction(nameof(Index));
@@ -335,6 +365,7 @@ namespace PodcastApplication.Controllers
             {
                 episode.IsActive = false;
                 episode.IsDeleted = true;
+                episode.IsPublic = false;
             }
 
             await _context.SaveChangesAsync();
@@ -433,7 +464,7 @@ namespace PodcastApplication.Controllers
         public async Task<IActionResult> RestoreEpisode(Guid id)
         {
             var episode = await _context.Episodes.FindAsync(id);
-            if (episode != null && episode.Podcast!.IsActive)
+            if (episode != null)
             {
                 episode.IsActive = true;
                 episode.IsDeleted = false;

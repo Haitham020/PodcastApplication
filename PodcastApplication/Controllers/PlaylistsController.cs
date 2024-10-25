@@ -250,7 +250,7 @@ namespace PodcastApplication.Controllers
             var playlist = await _context.Playlists
                  .Include(p => p.PlaylistItems!.Where(x => x.IsActive))
                  .ThenInclude(pi => pi.Podcast)
-                 .FirstOrDefaultAsync(p => p.PlaylistId == playlistId && p.UserId == userId);
+                 .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
 
             if (playlist == null)
             {
@@ -290,11 +290,11 @@ namespace PodcastApplication.Controllers
             var playlistItem = await _context.PlaylistItems.FindAsync(id);
             if (playlistItem != null)
             {
-                playlistItem.IsActive = false;
-                playlistItem.IsDeleted = true;
+                _context.Remove(playlistItem);
+                await _context.SaveChangesAsync();
+
             }
 
-            await _context.SaveChangesAsync();
 
             int playlistId = playlistItem!.PlaylistId;
 

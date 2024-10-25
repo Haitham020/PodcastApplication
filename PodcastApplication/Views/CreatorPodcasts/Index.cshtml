@@ -1,15 +1,38 @@
 ﻿@model IEnumerable<PodcastApplication.Models.Podcast>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Podcasts";
 }
 
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+
+<style>
+    .card {
+        height: 100%; /* Ensure cards are of equal height */
+    }
+
+    .card-img-top {
+        height: 200px; /* Set a fixed height for images */
+        object-fit: cover; /* Ensures the image covers the area without distorting */
+    }
+
+    .card-body {
+        min-height: 150px; /* Set a minimum height for card body to keep them uniform */
+    }
+
+</style>
+
 
 <p>
     <a asp-action="Create"><strong>Create New Podcast</strong></a>
     |
     <a asp-action="DeletedPodcasts" asp-controller="CreatorPodcasts"><strong>Restore Podcasts</strong></a>
+    |
+    @if (Model.Any())
+    {
+        <a asp-action="Create" asp-controller="CreatorEpisodes"><strong>Create Episode</strong></a>
+    }
 </p>
 
 @if (!Model.Any())
@@ -20,60 +43,37 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.PodcastTitle)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Category)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Creator)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IsPublic)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.PodcastTitle)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Category!.CategoryName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Creator!.UserName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.IsPublic)
-                    </td>
-                    <td>
-                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.PodcastId">Edit</a> |
-                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.PodcastId">Details</a> |
-                        
-                        <!-- Delete form -->
-                        <form asp-action="Delete" asp-route-id="@item.PodcastId" method="post" style="display:inline;" id="deleteForm-@item.PodcastId">
-                            @Html.AntiForgeryToken()
-                            <button type="button" class="btn btn-danger" onclick="confirmDelete('@item.PodcastId')">Delete</button>
-                        </form> |
-                        
-                        <a class="btn btn-success" asp-action="StagingPodcast" asp-controller="Creators" asp-route-id="@item.PodcastId">Manage</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="~/images/podcast/@item.PodcastCoverImg" class="card-img-top" alt="Podcast Image" /> 
+                    <div class="card-body">
+                        <h5 class="card-title">@item.PodcastTitle</h5>
+                        <p class="card-text">
+                            <strong>Category:</strong> @item.Category!.CategoryName <br />
+                            <strong>Creator:</strong> @item.Creator!.UserName <br />
+                            <strong>Public:</strong> @(item.IsPublic ? "Public" : "Not Public")
+                        </p>
+                        <div class="d-flex justify-content-between">
+                            <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.PodcastId">Edit</a>
+                            <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.PodcastId">Details</a>
+
+                            <form asp-action="Delete" asp-route-id="@item.PodcastId" method="post" style="display:inline;" id="deleteForm-@item.PodcastId">
+                                @Html.AntiForgeryToken()
+                                <button type="button" class="btn btn-danger" onclick="confirmDelete('@item.PodcastId')">Delete</button>
+                            </form>
+                            <a class="btn btn-success" asp-action="StagingPodcast" asp-controller="Creators" asp-route-id="@item.PodcastId">Manage</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
 <script>
     function confirmDelete(podcastId) {
@@ -90,6 +90,6 @@ else
                 // Submit the form via JavaScript if the user confirms
                 document.getElementById(`deleteForm-${podcastId}`).submit();
             }
-        })
+        });
     }
 </script>

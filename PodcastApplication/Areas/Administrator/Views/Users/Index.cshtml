@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ApplicationUser>
+﻿@model IEnumerable<PodcastApplication.Areas.Administrator.Models.ViewModels.UsersViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -11,6 +11,7 @@
             <tr>
                 <th>UserName</th>
                 <th>Email</th>
+                <th>Role</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -19,10 +20,11 @@
             @foreach (var user in Model)
             {
                 <tr>
-                    <td>@user.UserName</td>
-                    <td>@user.Email</td>
+                    <td>@user.User!.UserName</td>
+                    <td>@user.User.Email</td>
+                    <td>@user.Role</td>
                     <td>
-                        @if (user.InActive)
+                        @if (user.User.InActive)
                         {
                             <span class="badge badge-warning">Pending Approval</span>
                         }
@@ -32,22 +34,22 @@
                         }
                     </td>
                     <td>
-                        @if (user.InActive)
+                        @if (user.User.InActive)
                         {
                             <form asp-action="ApproveUser" method="post" class="d-inline">
-                                <input type="hidden" name="userId" value="@user.Id" />
+                                <input type="hidden" name="userId" value="@user.User.Id" />
                                 <button type="submit" class="btn btn-success btn-sm">Approve</button>
                             </form>
-                            <a class="btn btn-primary" asp-action="UserDetails" asp-route-id="@user.Id"
+                            <a class="btn btn-primary" asp-action="UserDetails" asp-route-id="@user.User.Id"
                                asp-controller="Users">Details</a>
                         }
                         else
                         {
                             <form asp-action="DeactivateUser" method="post" class="d-inline">
-                                <input type="hidden" name="userId" value="@user.Id" />
+                                <input type="hidden" name="userId" value="@user.User.Id" />
                                 <button type="submit" class="btn btn-danger btn-sm">Deactivate</button>
                             </form>
-                            <a class="btn btn-primary" asp-action="UserDetails" asp-route-id="@user.Id"
+                            <a class="btn btn-primary" asp-action="UserDetails" asp-route-id="@user.User.Id"
                                asp-controller="Users">Details</a>
                         }
                     </td>

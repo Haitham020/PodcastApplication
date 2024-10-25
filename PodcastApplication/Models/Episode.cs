@@ -32,5 +32,6 @@ namespace PodcastApplication.Models
         public ICollection<Comment>? Comments { get; set; }
         public ICollection<Favorite>? Favorites { get; set; }
         public ICollection<EpisodeListener>? EpisodeListeners { get; set; }
+        public UserEpisodeProgress? UserEpisodeProgress {  get; set; }
     }
 }

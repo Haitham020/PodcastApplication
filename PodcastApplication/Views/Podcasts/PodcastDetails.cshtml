@@ -49,7 +49,6 @@
 <section class="latest-podcast-section section-padding pb-0" id="section_2">
     <div class="container">
         <div class="row justify-content-center">
-
             <div class="col-lg-10 col-12">
                 <div class="section-title-wrap mb-5">
                     <h4 class="section-title">@Model.Podcast.PodcastTitle</h4>
@@ -59,73 +58,53 @@
                     <div class="col-lg-3 col-12">
                         <div class="custom-block-icon-wrap">
                             <div class="custom-block-image-wrap custom-block-image-detail-page">
-                                <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
+                                <img src="~/images/podcast/@Model.Podcast.PodcastCoverImg" class="custom-block-image img-fluid" alt="">
                             </div>
                         </div>
                     </div>
 
                     <div class="col-lg-9 col-12">
                         <div class="custom-block-info">
-                            <div class="custom-block-top d-flex mb-1">
+                            <h2 class="mb-2">@Model.Podcast.PodcastTitle</h2>
+                            <h4>@Model.Podcast.Category!.CategoryName</h4>
+                            <p>@Model.Podcast.PodcastDescription</p>
+
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="d-flex flex-column mb-3">
+                                       <h4 class="me-3">@Model.Episodes!.Count() Episode(s)</h4>
+                                       <h4 id="subscriptionCount" class="me-3 text-success">@Model.Podcast.Subscriptions!.Count() Subscribers</h4>
+                                </div>
+
 
                                 @if (_signInManager.IsSignedIn(User))
                                 {
-                                    @if (isSubscribed)
-                                    {
-                                        <button id="subscribeBtn" class="btn btn-secondary" onclick="toggleSubscription('@Model.Podcast.PodcastId', false)">
-                                            Unubscribe
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <button id="subscribeBtn" class="btn btn-primary" onclick="toggleSubscription('@Model.Podcast.PodcastId', true)">
-                                            Subscribe
-                                        </button>
-                                    }
-
+                                    <button id="subscribeBtn" class="btn btn-primary me-3" onclick="toggleSubscription('@Model.Podcast.PodcastId', @(isSubscribed ? "false" : "true"))">
+                                        @(isSubscribed ? "Unsubscribe" : "Subscribe")
+                                    </button>
                                 }
                                 else
                                 {
-                                    <a asp-action="Login" asp-controller="Account">
-                                        Login to access to podcasts and episodes!
+                                    <a asp-action="Login" asp-controller="Account" class="btn btn-secondary">
+                                        Login to access podcasts and episodes!
                                     </a>
                                 }
-
-
-                                <h4>
-                                    @Model.Episodes!.Count() Episodes
-                                </h4>
-
-
                             </div>
-                            <h4 id="subscriptionCount">
-                                @Model.Podcast.Subscriptions!.Count() Subscriptions
-                            </h4>
-                            <h2 class="mb-2">@Model.Podcast.PodcastTitle</h2>
-                            <h2 class="mb-2">@Model.Podcast.Category!.CategoryName</h2>
 
-                            <p>@Model.Podcast.PodcastDescription</p>
-
-
-                            <h4>@ratingCount</h4>
-                            <h3 id="averageRating">@averageRating</h3>
-
-                            @if (_signInManager.IsSignedIn(User))
-                            {
-                                <div class="rating" data-user-rating="@Model.UserRatingValue" data-podcast-id="@Model.Podcast.PodcastId">
-                                    <span class="star" data-value="1">★</span>
-                                    <span class="star" data-value="2">★</span>
-                                    <span class="star" data-value="3">★</span>
-                                    <span class="star" data-value="4">★</span>
-                                    <span class="star" data-value="5">★</span>
-                                </div>
-
-                                <button class="btn btn-primary" id="submitRating">Submit Rating</button>
-
-
-                                @Html.AntiForgeryToken()
-
-                            }
+                            <div class="rating-section mb-3">
+                                @if (_signInManager.IsSignedIn(User))
+                                {
+                                    <div class="rating" data-user-rating="@Model.UserRatingValue" data-podcast-id="@Model.Podcast.PodcastId">
+                                        <span class="star" data-value="1">★</span>
+                                        <span class="star" data-value="2">★</span>
+                                        <span class="star" data-value="3">★</span>
+                                        <span class="star" data-value="4">★</span>
+                                        <span class="star" data-value="5">★</span>
+                                    </div>
+                                    <button class="btn btn-primary mt-2" id="submitRating">Submit Rating</button>
+                                }
+                                <h4>Average Rating: <span id="averageRating">@averageRating</span></h4>
+                                <h4>Total Ratings: <span>@ratingCount</span></h4>
+                            </div>
 
                             <div class="modal fade" id="playlistModal-@Model.Podcast.PodcastId" aria-labelledby="playlistModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -152,49 +131,30 @@
                                                     <button type="button" class="btn btn-primary" onclick="submitPlaylists('@Model.Podcast.PodcastId')">Add to Playlist</button>
                                                 </div>
                                             </form>
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="social-icon ms-lg-auto ms-md-auto">
-
-                                <a href="#" class="bi-plus-circle fs-2" data-bs-toggle="modal" data-bs-target="#playlistModal-@Model.Podcast.PodcastId">
-
-                                </a>
-
-                            </div>
+                            
+                            
 
                             <div class="profile-block profile-detail-block d-flex flex-wrap align-items-center mt-5">
                                 <div class="d-flex mb-3 mb-lg-0 mb-md-0">
-                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <img src="~/images/profile/@(Model.Podcast.Creator?.ProfileImg ?? "userImg.png")" class="profile-block-image img-fluid" alt="">
+                                    <p class="ms-3">
+                                        <a asp-action="CreatorDetails"
+                                        asp-controller="Account"
+                                        asp-route-id="@Model.Podcast.CreatorId">@Model.Podcast.Creator!.UserName</a>
 
-                                    <p>
-                                        @Model.Podcast.Creator!.UserName
                                         <img src="~/images/verified.png" class="verified-image img-fluid" alt="">
                                         <strong>@Model.Podcast.Creator.CreatorGenre</strong>
                                     </p>
                                 </div>
-
-                                <ul class="social-icon ms-lg-auto ms-md-auto">
-                                    <li class="social-icon-item">
-                                        <a href="#" class="social-icon-link bi-instagram"></a>
-                                    </li>
-
-                                    <li class="social-icon-item">
-                                        <a href="#" class="social-icon-link bi-twitter"></a>
-                                    </li>
-
-                                    <li class="social-icon-item">
-                                        <a href="#" class="social-icon-link bi-whatsapp"></a>
-                                    </li>
-                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
@@ -218,7 +178,7 @@
                             <div class="me-3">
                                 <div class="custom-block-icon-wrap">
                                     <a href="detail-page.html" class="custom-block-image-wrap">
-                                        <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid rounded" alt="">
+                                        <img src="~/images/episodes/@episode.EpisodeCoverImg" class="custom-block-image img-fluid rounded" alt="">
                                     </a>
                                 </div>
 
@@ -259,20 +219,10 @@
                                         <span>@episode.Comments!.Count()</span>
                                     </a>
 
-                                    <a href="#" class="bi-download text-muted">
-                                        <span>50k</span>
-                                    </a>
+                                  
                                 </div>
                             </div>
 
-                            <div class="d-flex flex-column justify-content-start ms-3">
-                                <a href="#" class="badge bg-secondary mb-2">
-                                    <i class="bi-heart text-light"></i>
-                                </a>
-                                <a href="#" class="badge bg-secondary">
-                                    <i class="bi-bookmark text-light"></i>
-                                </a>
-                            </div>
                         </div>
                     </div>
                 }

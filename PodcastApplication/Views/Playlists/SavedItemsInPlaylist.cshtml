@@ -1,4 +1,5 @@
 ﻿@model Playlist
+@using System.Security.Claims
 
 
 @{
@@ -25,7 +26,7 @@
                         <div class="custom-block custom-block-full mb-4">
                             <div class="custom-block-image-wrap">
                                 <a href="detail-page.html">
-                                    <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
+                                    <img src="~/images/podcast/@podcast.Podcast!.PodcastCoverImg" class="custom-block-image img-fluid" alt="">
                                 </a>
                             </div>
 
@@ -38,15 +39,21 @@
                                 </h5>
 
                                 <div class="profile-block d-flex">
-                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <img src="~/images/profile/@(podcast.Podcast.Creator?.ProfileImg ?? "userImg.png")" class="profile-block-image img-fluid" alt="">
                                     
                                 </div>
 
                                 <p class="mb-0">@podcast.Podcast.PodcastDescription</p>
+                                @if (podcast.Playlist!.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier)) {
+                                    <a asp-action="DeletePlaylistItem" asp-controller="Playlists" asp-route-id="@podcast.PlaylistItemId">
+                                        Delete from playlist
+                                    </a>
+                                }
+                                else
+                                {
+                                   <p></p>
+                                }
 
-                                <a asp-action="DeletePlaylistItem" asp-controller="Playlists" asp-route-id="@podcast.PlaylistItemId">
-                                    Delete from playlist
-                                </a>
 
                                     
                                     

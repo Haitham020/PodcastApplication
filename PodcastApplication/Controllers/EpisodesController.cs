@@ -24,7 +24,7 @@ namespace PodcastApplication.Controllers
                 .Include(x => x.Podcast)
                 .ThenInclude(x => x!.Creator)
                 .OrderBy(e => e.CreatedAt)
-                .Where(x => x.IsActive)
+                .Where(x => x.IsPublic && x.IsActive)
                 .AsNoTrackingWithIdentityResolution()
                 .ToListAsync();
 
@@ -55,16 +55,22 @@ namespace PodcastApplication.Controllers
                 .Include(p => p.Podcast)
                     .ThenInclude(u => u!.Creator)
                 .Include(x => x.EpisodeLikes)
+                .Include(s => s.UserEpisodeProgress)
                 .FirstOrDefaultAsync(m => m.EpisodeId == id);
+
 
             if (episode == null)
             {
                 return NotFound();
             }
+
             var podcastEpisodes = await db.Episodes
                 .Where(p => p.PodcastId == episode.PodcastId && p.IsActive)
                 .OrderBy(c => c.CreatedAt)
                 .ToListAsync();
+
+
+
 
             int episodeNum = 1;
             foreach (var epis in podcastEpisodes)
@@ -73,7 +79,8 @@ namespace PodcastApplication.Controllers
                 episodeNum++;
             }
 
-            var relatedEpisodes = await db.Episodes.Include(x => x.Comments)
+            var relatedEpisodes = await db.Episodes
+                .Include(x => x.Comments)
                 .Include(x => x.EpisodeListeners)
                 .Include(i => i.EpisodeLikes)
                 .Include(p => p.Podcast)
@@ -81,7 +88,8 @@ namespace PodcastApplication.Controllers
                 .Include(p => p.Podcast)
                      .ThenInclude(c => c!.Category)
                 .Where(c => c.Podcast!.CategoryId == episode.Podcast!.CategoryId
-                && c.EpisodeId != episode.EpisodeId)
+                && c.EpisodeId != episode.EpisodeId
+                && c.IsPublic)
                 .Take(3)
                 .ToListAsync();
 
@@ -89,7 +97,7 @@ namespace PodcastApplication.Controllers
             {
                 Episode = episode,
                 RelatedEpisodes = relatedEpisodes,
-                EpisodeNumber = episode.EpisodeNumber
+                EpisodeNumber = episode.EpisodeNumber,
             };
 
             return View(episodeDetail);

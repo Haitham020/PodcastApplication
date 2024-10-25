@@ -63,7 +63,7 @@ namespace PodcastApplication.Controllers
                     user.Active = false;
                     user.InActive = true;
                 }
-                else if(userRole == "Listener")
+                else if (userRole == "Listener")
                 {
                     user.Active = true;
                     user.InActive = false;
@@ -108,7 +108,7 @@ namespace PodcastApplication.Controllers
                     {
                         return RedirectToAction("Index", "Home");
                     }
-                   
+
                     else
                     {
                         ModelState.AddModelError("", "Error Logging In, Check Credentials");
@@ -147,11 +147,14 @@ namespace PodcastApplication.Controllers
         [HttpGet]
         public async Task<IActionResult> CreatorDetails(string id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            var creator = await _userManager.FindByIdAsync(id);
+
+            var creator = await _userManager.Users
+                                  .Include(u => u.Podcasts!.Where(u => u.IsPublic))
+                                  .FirstOrDefaultAsync(u => u.Id == id);
             if(creator == null)
             {
                 return NotFound();

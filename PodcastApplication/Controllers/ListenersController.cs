@@ -78,9 +78,9 @@ namespace PodcastApplication.Controllers
                     {
                         await imgFile.CopyToAsync(stream);
                     }
-                    user.ProfileImg = imgFile.FileName;
+                    existingUser.ProfileImg = imgFile.FileName;
                 }
-
+                
                 _db.Update(existingUser);
                 await _db.SaveChangesAsync();
             }

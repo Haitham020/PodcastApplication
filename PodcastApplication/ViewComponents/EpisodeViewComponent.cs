@@ -22,7 +22,7 @@ namespace PodcastApplication.ViewComponents
                 .Include(x => x.Podcast)
                 .ThenInclude(x => x!.Creator)
                 .OrderBy(e => e.CreatedAt)
-                .Where(e => e.IsActive)
+                .Where(e => e.IsPublic)
                 .ToListAsync();
 
             foreach(var podcast in episodes.GroupBy(p => p.PodcastId))

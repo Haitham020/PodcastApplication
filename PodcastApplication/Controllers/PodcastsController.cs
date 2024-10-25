@@ -21,7 +21,7 @@ namespace PodcastApplication.Controllers
                 .Include(r => r.Ratings)
                 .Include(s => s.Subscriptions)
                 .AsNoTrackingWithIdentityResolution()
-                .Where(p => p.IsActive)
+                .Where(p => p.IsPublic && p.IsActive)
                 .ToListAsync();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -59,7 +59,7 @@ namespace PodcastApplication.Controllers
             }
 
             var episodes =  podcast.Episodes!
-                .Where(x => x.PodcastId == id && x.IsActive)
+                .Where(x => x.PodcastId == id && x.IsActive && x.IsPublic)
                 .OrderBy(x => x.CreatedAt)
                 .ToList();
 

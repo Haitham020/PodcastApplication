@@ -26,7 +26,7 @@
                             <div class="custom-block-image-wrap">
                                 <a asp-action="EpisodeDetails" asp-controller="Episodes"
                                    asp-route-id="@trending?.EpisodeId">
-                                    <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
+                                    <img src="~/images/episodes/@trending.EpisodeCoverImg" class="custom-block-image img-fluid" alt="">
                                 </a>
                             </div>
 
@@ -39,7 +39,7 @@
                                 </h5>
 
                                 <div class="profile-block d-flex">
-                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <img src="~/images/profile/@(trending?.Podcast?.Creator?.ProfileImg ?? "userImg.png")" class="profile-block-image img-fluid" alt="">
 
                                     <p>
                                         @trending?.Podcast?.Creator?.UserName

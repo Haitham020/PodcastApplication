@@ -227,6 +227,7 @@ namespace PodcastApplication.Controllers
             {
                 podcast.IsActive = false;
                 podcast.IsDeleted = true;
+                podcast.IsPublic = false;
 
                 foreach (var episode in podcast.Episodes!)
                 {

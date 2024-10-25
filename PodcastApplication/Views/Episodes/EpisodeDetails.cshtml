@@ -15,6 +15,7 @@
 
 @{
     ViewData["Title"] = "Episode Details";
+
 }
 
 
@@ -41,7 +42,11 @@
     .text-muted {
         color: #6c757d; 
     }
-
+    .completed-status {
+        float: right;
+        font-weight: bold;
+        color: #17a2b8;
+    }
 
 
 
@@ -57,12 +62,15 @@
             <div class="col-lg-10 col-12">
                 <div class="section-title-wrap mb-5">
                     <h4 class="section-title">@Model.Episode!.EpisodeTitle</h4>
+                    <small class="completed-status">
+                        @(Model.Episode.UserEpisodeProgress!.IsCompleted == true  ? "Completed" : "Not Completed")
+                    </small>
                 </div>
                 <div class="row">
                     <div class="col-lg-3 col-12">
                         <div class="custom-block-icon-wrap">
                             <div class="custom-block-image-wrap custom-block-image-detail-page">
-                                <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
+                                <img src="~/images/episodes/@Model.Episode.EpisodeCoverImg" class="custom-block-image img-fluid" alt="">
                             </div>
                         </div>
                     </div>
@@ -139,11 +147,13 @@
 
                             <div class="profile-block profile-detail-block d-flex flex-wrap align-items-center mt-5">
                                 <div class="d-flex mb-3 mb-lg-0 mb-md-0">
-                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <img src="@(Model.Episode.Podcast.Creator?.ProfileImg != null ? Url.Content($"~/images/profile/{Model.Episode.Podcast.Creator.ProfileImg}") : Url.Content("~/images/profile/userImg.png"))" class="profile-block-image img-fluid" alt="">
                                     <p>
-                                        @Model.Episode.Podcast!.Creator!.UserName
+                                        <a asp-action="CreatorDetails"
+                                        asp-controller="Account"
+                                           asp-route-id="@Model.Episode.Podcast.CreatorId">@Model.Episode.Podcast!.Creator!.UserName</a>
                                         <img src="~/images/verified.png" class="verified-image img-fluid" alt="">
-                                        <strong>@Model.Episode.Podcast.Creator.CreatorGenre</strong>
+                                        <strong>@Model.Episode.Podcast.Creator?.CreatorGenre</strong>
                                     </p>
                                 </div>
                                 <ul class="social-icon ms-lg-auto ms-md-auto">
@@ -182,8 +192,8 @@
     <div class="center">
         @if(_signInManager.IsSignedIn(User))
         {
-            <a class="btn btn-primary" asp-action="AllComments" asp-controller="Comments"
-            asp-route-id="@Model.Episode.EpisodeId">View Comments</a>
+            <a asp-action="AllComments" asp-controller="Comments"
+            asp-route-id="@Model.Episode.EpisodeId"><strong>View Comments</strong></a>
         }
         else
         {
@@ -344,13 +354,6 @@ audioPlayer.addEventListener('play', () => {
 
 
 
-
-
-
-
-
-
-
     // audio player
     $(document).ready(function () {
         const audioPlayer = document.getElementById('audioPlayer');
@@ -458,13 +461,6 @@ audioPlayer.addEventListener('play', () => {
             }
         });
     }
-
-
-
-
-    //Comments
-
-    
 
    
 

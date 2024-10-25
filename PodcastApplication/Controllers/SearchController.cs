@@ -26,22 +26,24 @@ namespace PodcastApplication.Controllers
             }
 
             var podcasts = await _context.Podcasts
-                .Where(p => p.IsPublic && (p.PodcastTitle!.StartsWith(query) && p.PodcastTitle.Contains(query)))
+                .Include(x => x.Creator)
+                .Where(p => p.IsPublic &&  p.PodcastTitle!.Contains(query))
                 .AsNoTracking()
                 .ToListAsync();
 
             var episodes = await _context.Episodes
-                .Where(e => e.IsPublic && (e.EpisodeTitle!.StartsWith(query) && e.EpisodeTitle.Contains(query)))
+                .Include(x => x.Podcast)
+                .Where(e => e.IsPublic &&  e.EpisodeTitle!.Contains(query))
                 .AsNoTracking()
                 .ToListAsync();
 
             var categories = await _context.Categories
-                .Where(c => c.IsActive && (c.CategoryName!.StartsWith(query) && c.CategoryName.Contains(query)))
+                .Where(c => c.IsActive && c.CategoryName!.Contains(query))
                 .AsNoTracking()
                 .ToListAsync();
 
             var playlists = await _context.Playlists
-                .Where(c => c.IsPublic && (c.PlaylistName!.StartsWith(query) && c.PlaylistName.Contains(query)))
+                .Where(c => c.IsPublic && c.PlaylistName!.Contains(query))
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -66,17 +68,17 @@ namespace PodcastApplication.Controllers
             }
 
             var podcastSuggestions = await _context.Podcasts
-                .Where(p => p.PodcastTitle!.StartsWith(query))
+                .Where(p => p.PodcastTitle!.StartsWith(query) && p.IsPublic)
                 .Select(p => p.PodcastTitle) 
                 .ToListAsync();
 
             var episodeSuggestions = await _context.Episodes
-                .Where(e => e.EpisodeTitle!.StartsWith(query))
+                .Where(e => e.EpisodeTitle!.StartsWith(query) && e.IsPublic)
                 .Select(e => e.EpisodeTitle)
                 .ToListAsync();
 
             var categorySuggestions = await _context.Categories
-                .Where(c => c.CategoryName!.StartsWith(query))
+                .Where(c => c.CategoryName!.StartsWith(query) && c.IsActive)
                 .Select(c => c.CategoryName)
                 .ToListAsync();
 

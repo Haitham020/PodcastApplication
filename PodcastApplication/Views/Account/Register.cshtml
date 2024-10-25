@@ -13,25 +13,25 @@
 
                 <div class="mb-3">
                     <label asp-for="UserName" class="form-label"></label>
-                    <input asp-for="UserName" class="form-control" placeholder="Enter your username" />
+                    <input asp-for="UserName" class="form-control" placeholder="Enter your username" required/>
                     <span asp-validation-for="UserName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
                     <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                    <input asp-for="Email" class="form-control" placeholder="Enter your email" required/>
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
                     <label asp-for="Password" class="form-label"></label>
-                    <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                    <input asp-for="Password" class="form-control" placeholder="Enter your password" required />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
                     <label asp-for="ConfirmPassword" class="form-label"></label>
-                    <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+                    <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" required/>
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
 
@@ -45,8 +45,10 @@
 
                 <div class="mb-3">
                     <label asp-for="Age" class="form-label"></label>
-                    <input asp-for="Age" class="form-control" placeholder="Enter your age" />
+                    <input asp-for="Age" class="form-control" placeholder="Enter your age" required min="1" type="number" value="1" />
+                    <span asp-validation-for="Age" class="text-danger"></span>
                 </div>
+
 
                 <div class="mb-3">
                     <label for="Role" class="form-label">Choose</label>

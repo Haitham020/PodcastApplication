@@ -270,7 +270,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Comment", b =>
@@ -305,7 +305,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Episode", b =>
@@ -358,7 +358,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("PodcastId");
 
-                    b.ToTable("Episodes");
+                    b.ToTable("Episodes", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.EpisodeLike", b =>
@@ -390,7 +390,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EpisodeLikes");
+                    b.ToTable("EpisodeLikes", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.EpisodeListener", b =>
@@ -413,7 +413,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EpisodeListeners");
+                    b.ToTable("EpisodeListeners", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Favorite", b =>
@@ -436,7 +436,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Favorites");
+                    b.ToTable("Favorites", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Menu", b =>
@@ -461,7 +461,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasKey("MenuId");
 
-                    b.ToTable("Menus");
+                    b.ToTable("Menus", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Playlist", b =>
@@ -501,7 +501,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Playlists");
+                    b.ToTable("Playlists", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.PlaylistItem", b =>
@@ -533,7 +533,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("PodcastId");
 
-                    b.ToTable("PlaylistItems");
+                    b.ToTable("PlaylistItems", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Podcast", b =>
@@ -579,7 +579,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Podcasts");
+                    b.ToTable("Podcasts", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Rating", b =>
@@ -605,7 +605,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Ratings", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.SavedPlaylist", b =>
@@ -628,7 +628,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SavedPlaylists");
+                    b.ToTable("SavedPlaylists", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.Subscription", b =>
@@ -660,7 +660,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscriptions", (string)null);
                 });
 
             modelBuilder.Entity("PodcastApplication.Models.UserEpisodeProgress", b =>
@@ -692,7 +692,7 @@ namespace PodcastApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserEpisodeProgresses");
+                    b.ToTable("UserEpisodeProgresses", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -6,11 +6,27 @@
 
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
+<style>
+    .card {
+        height: 100%; /* Ensure cards are of equal height */
+    }
+
+    .card-img-top {
+        height: 200px; /* Set a fixed height for images */
+        object-fit: cover; /* Ensures the image covers the area without distorting */
+    }
+
+    .card-body {
+        min-height: 150px; /* Set a minimum height for card body to keep them uniform */
+    }
+
+</style>
+
+
 <p>
     <a asp-action="Create"><strong>Create New Episode</strong></a> |
     <a asp-action="Recorder"><strong>Built-In Recorder</strong></a> |
     <a asp-action="DeletedEpisodes" asp-controller="CreatorEpisodes"><strong>Restore Episodes</strong></a>
-
 </p>
 
 @if (!Model.Any())
@@ -21,62 +37,33 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.EpisodeTitle)
-                </th>
-
-                <th>
-                    @Html.DisplayNameFor(model => model.EpisodeDuration)
-                </th>
-
-                <th>
-                    @Html.DisplayNameFor(model => model.Podcast)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IsPublic)
-                </th>
-              
-
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.EpisodeTitle)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.EpisodeDuration)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Podcast!.PodcastTitle)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.IsPublic)
-                    </td>
-                  
-
-                    <td>
-                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.EpisodeId">Edit</a> |
-                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.EpisodeId">Details</a> |
-                        <form asp-action="Delete" asp-route-id="@item.EpisodeId" method="post" style="display:inline;" id="deleteForm-@item.EpisodeId">
-                            @Html.AntiForgeryToken()
-                            <button type="button" class="btn btn-danger" onclick="confirmDelete('@item.EpisodeId')">Delete</button>
-                        </form> |
-                        <a asp-action="StagingPodcast" asp-controller="Creators" asp-route-id="@item.PodcastId"><strong>Go to podcast</strong></a>
-
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="~/images/episodes/@item.EpisodeCoverImg" class="card-img-top" alt="Episode Image" />
+                    <div class="card-body">
+                        <h5 class="card-title">@item.EpisodeTitle</h5>
+                        <p class="card-text">
+                            <strong>Duration:</strong> @item.EpisodeDuration <br />
+                            <strong>Podcast:</strong> @item.Podcast!.PodcastTitle <br />
+                            <strong>Status:</strong> @(item.IsPublic ? "Public" : "Not Public")
+                        </p>
+                        <div class="d-flex flex-wrap justify-content-between">
+                            <a asp-action="Edit" asp-route-id="@item.EpisodeId"><strong>Edit</strong></a> |
+                            <a asp-action="Details" asp-route-id="@item.EpisodeId"><strong>Details</strong></a> |
+                            <form asp-action="Delete" asp-route-id="@item.EpisodeId" method="post" style="display:inline;" id="deleteForm-@item.EpisodeId">
+                                @Html.AntiForgeryToken()
+                                <button type="button" class="btn btn-danger" onclick="confirmDelete('@item.EpisodeId')">Delete</button>
+                            </form>
+                            <a asp-action="StagingPodcast" asp-controller="Creators" asp-route-id="@item.PodcastId" class="btn btn-info">Go to Podcast</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -95,6 +82,6 @@ else
             if (result.isConfirmed) {
                 document.getElementById(`deleteForm-${episodeId}`).submit();
             }
-        })
-        }
+        });
+    }
 </script>

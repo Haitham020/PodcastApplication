@@ -13,6 +13,9 @@
 
 <div class="container mt-5">
     <h1 class="mb-4">Comments</h1>
+    <a asp-action="EpisodeDetails"
+    asp-controller="Episodes"
+    asp-route-id="@episodeId"><strong>Return to episode</strong></a>
 
     <div class="mt-4">
         <h3>Add a Comment</h3>
@@ -73,19 +76,27 @@
                     id: episodeId,
                     commentText: commentText
                 },
-                success: function (newComment) {
-                    displayNewComment(newComment);
-                    $('#newCommentText').val('');
+                success: function (newComment) { 
+                    const commentsList = $('.list-group');
+
+                    if (commentsList.children().length === 0) {
+                        location.reload();
+                    } 
+                    else {
+                      displayNewComment(newComment);
+                      $('#newCommentText').val(''); 
+                    }                 
                 },
                 error: function () {
                     alert('Failed to add comment.');
                 }
             });
-            displayNewComment();
         }
 
         function displayNewComment(comment) {
             const commentsList = $('.list-group');
+
+           
             const newCommentHTML = `
                         <div class="list-group-item d-flex justify-content-between align-items-start mb-2">
                             <div class="w-75">

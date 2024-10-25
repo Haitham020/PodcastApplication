@@ -191,6 +191,7 @@ namespace PodcastApplication.Areas.Administrator.Controllers
             {
                 podcast.IsDeleted = true;
                 podcast.IsActive = false;
+                podcast.IsPublic = false;
             }
 
             await _context.SaveChangesAsync();

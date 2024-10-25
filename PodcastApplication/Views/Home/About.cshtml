@@ -45,7 +45,9 @@
 
                         <div class="team-info">
                             <h4 class="mb-2">
-                                @user.UserName
+                                <a asp-action="CreatorDetails"
+                                asp-controller="Account"
+                                asp-route-id="@user.Id">@user.UserName</a>
                                 <img src="~/images/verified.png" class="verified-image img-fluid" alt="">
                             </h4>
 

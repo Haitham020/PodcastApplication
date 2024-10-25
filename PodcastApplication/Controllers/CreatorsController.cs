@@ -110,7 +110,7 @@ namespace PodcastApplication.Controllers
             }
             else
             {
-                if (podcast.Episodes!.Any() && podcast.Episodes != null)
+                if (podcast.Episodes!.Any(x => x.IsActive) && podcast.Episodes != null)
                 {
                     podcast.IsPublic = true;
 

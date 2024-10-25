@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PodcastApplication.Models
 {
@@ -13,7 +12,7 @@ namespace PodcastApplication.Models
         public string? ProfileBio { get; set; }
         public int Age { get; set; }
         public string? CreatorGenre { get; set; }
-      
+
         public ICollection<Podcast>? Podcasts { get; set; }
     }
 

@@ -1,29 +1,54 @@
 ﻿@model ApplicationUser
 
-<h2>User Details</h2>
+<h2 class="mb-4">User Details</h2>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Username</dt>
-        <dd class="col-sm-10">@Model.UserName</dd>
+<div class="card p-4 shadow-sm mb-4">
+    <div class="row">
+        <div class="col-md-4 text-center">
+            <img src="~/images/profile/@(Model.ProfileImg ?? "userImg.png")" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+        </div>
+        <div class="col-md-8">
+            <dl class="row">
+                <dt class="col-sm-4">Username</dt>
+                <dd class="col-sm-8">@Model.UserName</dd>
 
-        <dt class="col-sm-2">Email</dt>
-        <dd class="col-sm-10">@Model.Email</dd>
-        
-        <dd class="col-sm-2">Age</dd>
-        <dd class="col-sm-10">@Model.Age</dd>
+                <dt class="col-sm-4">Email</dt>
+                <dd class="col-sm-8">@Model.Email</dd>
 
-        <dd class="col-sm-2">Date Joined</dd>
-        <dd class="col-sm-10">@Model.DateJoined.ToShortDateString()</dd>
+                <dt class="col-sm-4">Age</dt>
+                <dd class="col-sm-8">@Model.Age</dd>
 
-        <dd class="col-sm-2">Country</dd>
-        <dd class="col-sm-10">@Model.Country</dd>
+                <dt class="col-sm-4">Date Joined</dt>
+                <dd class="col-sm-8">@Model.DateJoined.ToShortDateString()</dd>
 
-        <dd class="col-sm-2">Status</dd>
-        <dd class="col-sm-10">@(Model.Active ? "Active" : "Inactive")</dd>
+                <dt class="col-sm-4">Country</dt>
+                <dd class="col-sm-8">@Model.Country</dd>
 
-
-    </dl>
+                <dt class="col-sm-4">Status</dt>
+                <dd class="col-sm-8">@(Model.Active ? "Active" : "Inactive")</dd>
+            </dl>
+        </div>
+    </div>
 </div>
 
-<a href="@Url.Action("Index", "Users")" class="btn btn-primary">Back to Users List</a>
+@if (Model.Podcasts != null && Model.Podcasts.Any())
+{
+    <h3 class="mb-4">Podcasts</h3>
+    <div class="row">
+        @foreach (var podcast in Model.Podcasts)
+        {
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img src="~/images/episodes/@podcast.PodcastCoverImg" class="card-img-top" alt="@podcast.PodcastTitle" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@podcast.PodcastTitle</h5>
+                        <p class="card-text">Genre: @Model.CreatorGenre</p>
+                        <a href="@Url.Action("PodcastDetails", "Podcasts", new { id = podcast.PodcastId })" class="btn btn-primary">View Podcast</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<a href="@Url.Action("Index", "Users")" class="btn btn-secondary mt-4">Back to Users List</a>

@@ -11,8 +11,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
-
-
 <section class="latest-podcast-section section-padding pb-0" id="section_2">
     <div class="container">
         <div class="row justify-content-center">
@@ -76,7 +74,7 @@
                             @if (Model.Episode.Transcript != null)
                             {
                                 <textarea id="transcriptTextArea" style="width:100%; height:200px;">@Model.Episode.Transcript</textarea>
-                                <button id="saveTranscriptButton" class="btn btn-success">Save Transcript</button>
+                                <button id="saveTranscriptButton" class="btn btn-success">Edit & Save Transcript</button>
 
                             }
                             else
@@ -84,7 +82,7 @@
                                 <button id="transcribeButton" class="btn btn-primary">Transcribe Audio</button>
                                 <div id="transcriptionResult">
                                     <textarea id="transcriptTextArea" style="display:none; width:100%; height:200px;"></textarea>
-                                    <button id="saveTranscriptButton" style="display:none;" class="btn btn-success">Save Transcript</button>
+                                    <button id="saveTranscriptButton" style="display:none;" class="btn btn-success">Edit & Save Transcript</button>
                                 </div>
                             }
 
@@ -158,14 +156,14 @@
                 transcriptTextArea.style.display = 'block';
 
                 $.ajax({
-                    url: '/CreatorEpisodes/Transcribe', 
+                    url: '/CreatorEpisodes/Transcribe',
                     type: 'POST',
                     data: {
                         episodeId: episodeId
                     },
                     success: function (response) {
-                        transcriptTextArea.value = response.text; 
-                        transcriptTextArea.style.display = 'block'; 
+                        transcriptTextArea.value = response.text;
+                        transcriptTextArea.style.display = 'block';
                         saveTranscriptButton.style.display = 'block';
                     },
                     error: function (xhr, status, error) {

@@ -53,12 +53,12 @@
                             <h5 class="mb-2">
                                 <a asp-action="EpisodeDetails" asp-controller="Episodes"
                                    asp-route-id="@episode.EpisodeId">
-                                    @episode.EpisodeTitle  | @episode.Podcast.PodcastTitle
+                                    @episode.EpisodeTitle
                                 </a>
                             </h5>
 
                             <div class="profile-block d-flex">
-                                <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                <img src="~/images/profile/@(episode.Podcast.Creator?.ProfileImg ?? "userImg.png" )" class="profile-block-image img-fluid" alt="">
 
                                 <p>
                                     @episode.Podcast.Creator!.UserName
