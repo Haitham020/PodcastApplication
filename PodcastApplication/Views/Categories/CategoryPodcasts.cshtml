@@ -27,14 +27,14 @@
                 @foreach (var podcast in Model.Podcasts)
                 {
 
-                    @* var ratingCount = podcast.Ratings?.Count() ?? 0;
-            var averageRating = ratingCount > 0 ? podcast.Ratings!.Average(r => r.RatingValue) : 0; *@
+                    var ratingCount = podcast.Ratings?.Count() ?? 0;
+                    var averageRating = ratingCount > 0 ? podcast.Ratings!.Average(r => r.RatingValue) : 0;
 
                     <div class="col-lg-4 col-12 mb-4">
                         <div class="custom-block custom-block-full mb-4">
                             <div class="custom-block-image-wrap">
                                 <a href="detail-page.html">
-                                    <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
+                                    <img src="~/images/podcast/@podcast.PodcastCoverImg" class="custom-block-image img-fluid" alt="">
                                 </a>
                             </div>
 
@@ -47,7 +47,7 @@
                                 </h5>
 
                                 <div class="profile-block d-flex">
-                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <img src="~/images/profile/@(podcast.Creator?.ProfileImg ?? "userImg.png")" class="profile-block-image img-fluid" alt="">
 
                                     <p>
                                         @podcast.Creator!.UserName
@@ -60,11 +60,11 @@
                                 <div class="custom-block-bottom d-flex justify-content-between mt-3">
 
                                     <a href="#" class="bi-heart me-1">
-                                        <span>@* @podcast.Subscriptions!.Count() Followers *@ </span>
+                                        <span>@(podcast.Subscriptions?.Count() ?? 0 ) Followers</span>
                                     </a>
 
                                     <a href="#" class="bi-star me-1">
-                                        <span>@* @averageRating.ToString("F1") stars *@</span>
+                                        <span>@averageRating.ToString("F1") stars </span>
                                     </a>
                                 </div>
                             </div>

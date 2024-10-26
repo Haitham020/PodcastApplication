@@ -42,6 +42,7 @@ namespace PodcastApplication.Controllers
 
             var appDbContext = _context.Episodes
                 .Include(e => e.Podcast)
+                .OrderBy(e => e.CreatedAt)
                 .Where(x => x.Podcast!.CreatorId == userId && x.IsActive);
 
             return View(await appDbContext.ToListAsync());

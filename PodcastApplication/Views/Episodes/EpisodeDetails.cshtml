@@ -12,16 +12,9 @@
 
 }
 
-
-@{
-    ViewData["Title"] = "Episode Details";
-
-}
-
-
 <style>
 
-    
+
     .transcript-section {
         background-color: #f9f9f9;
         padding: 15px;
@@ -40,17 +33,26 @@
     }
 
     .text-muted {
-        color: #6c757d; 
+        color: #6c757d;
     }
+
     .completed-status {
         float: right;
         font-weight: bold;
         color: #17a2b8;
     }
 
-
-
 </style>
+
+
+@{
+
+    ViewData["Title"] = "Episode Details";
+}
+
+
+
+
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -63,7 +65,7 @@
                 <div class="section-title-wrap mb-5">
                     <h4 class="section-title">@Model.Episode!.EpisodeTitle</h4>
                     <small class="completed-status">
-                        @(Model.Episode.UserEpisodeProgress!.IsCompleted == true  ? "Completed" : "Not Completed")
+                        @(Model.Episode.UserEpisodeProgress?.IsCompleted == true ? "Completed" : "Not Completed")
                     </small>
                 </div>
                 <div class="row">
@@ -77,7 +79,7 @@
 
                     <div class="col-lg-9 col-12">
                         <div class="custom-block-info">
-                            
+
                             <div class="custom-block-top d-flex mb-1">
                                 <small class="me-4">
                                     <button id="playPauseBtn" class="btn btn-primary"><i class="bi-play"></i> Play now</button>
@@ -90,12 +92,12 @@
                                         @Model.EpisodeNumber
                                     </span>
                                 </small>
-                                <small class="ms-auto">Likes <span id="like-count" class="badge">@Model.Episode.EpisodeLikes!.Count()</span></small>
+                                <small class="ms-auto">Likes <span id="like-count" class="badge">@(Model.Episode.EpisodeLikes?.Count() ?? 0)</span></small>
                             </div>
 
-                            <h2 class="mb-2">@Model.Episode.EpisodeTitle</h2>                
-                            <a asp-action="PodcastDetails" asp-controller="Podcasts" asp-route-id="@Model.Episode.PodcastId" class="mb-2">@Model.Episode.Podcast!.PodcastTitle</a>   
-                            
+                            <h2 class="mb-2">@Model.Episode.EpisodeTitle</h2>
+                            <a asp-action="PodcastDetails" asp-controller="Podcasts" asp-route-id="@Model.Episode.PodcastId" class="mb-2">@Model.Episode.Podcast!.PodcastTitle</a>
+
                             <p>@Model.Episode.EpisodeDescription</p>
 
                             <!-- Audio Player Section -->
@@ -138,19 +140,19 @@
                                 }
                                 else
                                 {
-                                        <a id="favBtn-@Model.Episode.EpisodeId" class="badge ms-auto" onclick="toggleFavorite('@Model.Episode.EpisodeId', true)">
+                                    <a id="favBtn-@Model.Episode.EpisodeId" class="badge ms-auto" onclick="toggleFavorite('@Model.Episode.EpisodeId', true)">
                                         <i class="bi-bookmark fs-3"></i>
                                     </a>
                                 }
 
-                        </div>
+                            </div>
 
                             <div class="profile-block profile-detail-block d-flex flex-wrap align-items-center mt-5">
                                 <div class="d-flex mb-3 mb-lg-0 mb-md-0">
                                     <img src="@(Model.Episode.Podcast.Creator?.ProfileImg != null ? Url.Content($"~/images/profile/{Model.Episode.Podcast.Creator.ProfileImg}") : Url.Content("~/images/profile/userImg.png"))" class="profile-block-image img-fluid" alt="">
                                     <p>
                                         <a asp-action="CreatorDetails"
-                                        asp-controller="Account"
+                                           asp-controller="Account"
                                            asp-route-id="@Model.Episode.Podcast.CreatorId">@Model.Episode.Podcast!.Creator!.UserName</a>
                                         <img src="~/images/verified.png" class="verified-image img-fluid" alt="">
                                         <strong>@Model.Episode.Podcast.Creator?.CreatorGenre</strong>
@@ -190,10 +192,10 @@
         </div>
     </div>
     <div class="center">
-        @if(_signInManager.IsSignedIn(User))
+        @if (_signInManager.IsSignedIn(User))
         {
             <a asp-action="AllComments" asp-controller="Comments"
-            asp-route-id="@Model.Episode.EpisodeId"><strong>View Comments</strong></a>
+               asp-route-id="@Model.Episode.EpisodeId"><strong>View Comments</strong></a>
         }
         else
         {
@@ -221,7 +223,7 @@
                             <div class="custom-block-image-wrap">
                                 <a asp-action="EpisodeDetails"
                                    asp-controller="Episodes" asp-route-id="@episode.EpisodeId">
-                                    <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
+                                    <img src="~/images/episodes/@episode.EpisodeCoverImg" class="custom-block-image img-fluid" alt="">
                                 </a>
                             </div>
 
@@ -236,7 +238,7 @@
                                 </h5>
 
                                 <div class="profile-block d-flex">
-                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <img src="~/images/profile/@(episode.Podcast.Creator?.ProfileImg ?? "userImg.png")" class="profile-block-image img-fluid" alt="">
 
                                     <p>
                                         @episode.Podcast!.Creator!.UserName
@@ -248,20 +250,20 @@
 
                                 <div class="custom-block-bottom d-flex justify-content-between mt-3">
                                     <a href="#" class="bi-headphones me-1">
-                                        <span>@episode.EpisodeListeners!.Count()</span>
+                                        <span>@(episode.EpisodeListeners?.Count() ?? 0)</span>
                                     </a>
 
                                     <a href="#" class="bi-heart me-1">
-                                        <span>@episode.EpisodeLikes!.Count()</span>
+                                        <span>@(episode.EpisodeLikes?.Count() ?? 0)</span>
                                     </a>
 
                                     <a href="#" class="bi-chat me-1">
-                                        <span>@episode.Comments!.Count()</span>
+                                        <span>@(episode.Comments?.Count() ?? 0)</span>
                                     </a>
                                 </div>
                             </div>
 
-                            
+
                         </div>
                     </div>
                 }
@@ -282,26 +284,26 @@
 <script>
 
     //Listeners
-let audioPlayer = document.getElementById('audioPlayer');
-let episodeId = '@Model.Episode.EpisodeId';
-let isFirstPlay = true; 
+    let audioPlayer = document.getElementById('audioPlayer');
+    let episodeId = '@Model.Episode.EpisodeId';
+    let isFirstPlay = true;
 
-audioPlayer.addEventListener('play', () => {
-    if (isFirstPlay) {
-        $.ajax({
-            url: '/Episodes/AddEpisodeListener',
-            type: 'POST',
-            data: { episodeId: episodeId },
-            success: function() {
-                console.log("Listener added for episode:", episodeId);
-                isFirstPlay = false; 
-            },
-            error: function(xhr, status, error) {
-                console.error("Error adding listener:", error);
-            }
-        });
-    }
-});
+    audioPlayer.addEventListener('play', () => {
+        if (isFirstPlay) {
+            $.ajax({
+                url: '/Episodes/AddEpisodeListener',
+                type: 'POST',
+                data: { episodeId: episodeId },
+                success: function () {
+                    console.log("Listener added for episode:", episodeId);
+                    isFirstPlay = false;
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error adding listener:", error);
+                }
+            });
+        }
+    });
 
 
     //Progress
@@ -311,46 +313,46 @@ audioPlayer.addEventListener('play', () => {
         let episodeId = '@Model.Episode.EpisodeId';
         let currentTime = Date.now();
 
-        if(currentTime - lastProgressSavedTime >= 7000) {
+        if (currentTime - lastProgressSavedTime >= 7000) {
             lastProgressSavedTime = currentTime;
 
             $.ajax(
-            {
-                url: '/Episodes/SaveProgress',
-                type: 'POST',
-                data: { 
-                    episodeId: episodeId, 
-                    progress: progress 
-                },
-                success: function() {
-                    console.log("Progress saved");
+                {
+                    url: '/Episodes/SaveProgress',
+                    type: 'POST',
+                    data: {
+                        episodeId: episodeId,
+                        progress: progress
+                    },
+                    success: function () {
+                        console.log("Progress saved");
+                    }
                 }
-            }
-            
-        )
+
+            )
         }
-        
+
     })
 
-    $(document).ready(function() {
-    let episodeId = '@Model.Episode.EpisodeId';
+    $(document).ready(function () {
+        let episodeId = '@Model.Episode.EpisodeId';
 
-    $.ajax({
-        url: '/Episodes/GetProgress',
-        type: 'GET',
-        data: { episodeId: episodeId },
-        success: function(progress) {
-            if (progress) {
-                console.log('Fetched progress:', progress);  
-                if (progress && isFinite(progress)) {  
-                        audioPlayer.currentTime = progress; 
-                } else {
-                  console.warn('Invalid progress value:', progress); 
+        $.ajax({
+            url: '/Episodes/GetProgress',
+            type: 'GET',
+            data: { episodeId: episodeId },
+            success: function (progress) {
+                if (progress) {
+                    console.log('Fetched progress:', progress);
+                    if (progress && isFinite(progress)) {
+                        audioPlayer.currentTime = progress;
+                    } else {
+                        console.warn('Invalid progress value:', progress);
+                    }
                 }
             }
-        }
+        });
     });
-}); 
 
 
 
@@ -462,7 +464,7 @@ audioPlayer.addEventListener('play', () => {
         });
     }
 
-   
+
 
 </script>
 
