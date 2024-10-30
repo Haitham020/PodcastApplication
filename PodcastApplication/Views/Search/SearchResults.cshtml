@@ -112,7 +112,7 @@
                                 </h5>
 
                                 <div class="profile-block d-flex">
-                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <img src="~/images/profile/@(podcast.Creator?.ProfileImg ?? "userImg.png")" class="profile-block-image img-fluid" alt="">
                                     <p>
                                         @podcast.Creator!.UserName
                                         <strong>@podcast.Creator.CreatorGenre</strong>

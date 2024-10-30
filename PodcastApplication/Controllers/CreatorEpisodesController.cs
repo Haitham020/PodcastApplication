@@ -361,15 +361,30 @@ namespace PodcastApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var episode = await _context.Episodes.FindAsync(id);
+            var episode = await _context.Episodes
+                .Include(e => e.Podcast)
+                .FirstOrDefaultAsync(e => e.EpisodeId == id);
+
+            var episodesCount = _context.Episodes
+                .Count(x => x.PodcastId == episode!.PodcastId && x.IsPublic);
+
             if (episode != null)
             {
                 episode.IsActive = false;
                 episode.IsDeleted = true;
                 episode.IsPublic = false;
+
+                if(episodesCount <= 1)
+                {
+                    episode.Podcast!.IsPublic = false;
+                }
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                return NoContent();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

@@ -54,7 +54,7 @@ else
                         <p class="card-text">
                             <strong>Category:</strong> @item.Category!.CategoryName <br />
                             <strong>Creator:</strong> @item.Creator!.UserName <br />
-                            <strong>Public:</strong> @(item.IsPublic ? "Public" : "Not Public")
+                            <strong>Status:</strong> @(item.IsPublic ? "Public" : "Not Public")
                         </p>
                         <div class="d-flex justify-content-between">
                             <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.PodcastId">Edit</a>
