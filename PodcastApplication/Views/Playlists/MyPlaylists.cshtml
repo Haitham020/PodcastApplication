@@ -1,20 +1,17 @@
-﻿@model List<Playlist>
-
-
+﻿@model List<PodcastApplication.Models.Playlist>
 
 @{
     ViewData["Title"] = "My Playlists";
 }
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
-
-
-<div class="container">
-    <h2>Your Playlists</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Your Playlists</h2>
 
     @if (Model == null || !Model.Any())
     {
-        <div class="alert alert-info">
-            You have no playlists yet. <a href="@Url.Action("Create", "Playlists")">Create a new playlist</a>!
+        <div class="alert alert-info text-center">
+            You have no playlists yet. <a href="@Url.Action("Create", "Playlists")" class="alert-link">Create a new playlist</a>!
         </div>
     }
     else
@@ -23,24 +20,51 @@
             @foreach (var playlist in Model)
             {
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
+                    <div class="card border-primary shadow-sm rounded-3">
+                        <div class="card-body text-center">
+                            <!-- Playlist Icon -->
+                            <div class="playlist-icon mb-3">
+                                <i class="bi bi-headphones" style="font-size: 3rem; color: #007bff;"></i>
+                            </div>
                             <h5 class="card-title">@playlist.PlaylistName</h5>
-                            <p class="card-text">@playlist.PlaylistDescription</p>
-                            <a asp-action="SavedItemsInPlaylist" asp-controller="Playlists" asp-route-playlistId="@playlist.PlaylistId"
-                            class="btn btn-primary">View Playlist</a>
-                            <a asp-action="Delete" asp-controller="Playlists" asp-route-id="@playlist.PlaylistId"
-                            class="btn btn-primary">Delete Playlist</a>
+                            <p class="card-text text-truncate" style="max-height: 60px;">@playlist.PlaylistDescription</p>
+                            <div class="d-flex justify-content-between">
+                                <a asp-action="SavedItemsInPlaylist" asp-controller="Playlists" asp-route-playlistId="@playlist.PlaylistId" class="btn btn-outline-primary btn-sm">View Playlist</a>
+                                <!-- Trigger SweetAlert for Deletion -->
+                                <form asp-action="Delete" asp-route-id="@playlist.PlaylistId" method="post" style="display:inline;" id="deleteForm-@playlist.PlaylistId">
+                                    @Html.AntiForgeryToken()
+                                    <button type="button" class="btn btn-danger" onclick="deletePlaylist('@playlist.PlaylistId')">Delete</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             }
         </div>
     }
+
+    <div class="text-center mt-4">
+        <a href="@Url.Action("Create", "Playlists")" class="btn btn-lg btn-success">Create a New Playlist</a>
+    </div>
 </div>
 
-<a href="@Url.Action("Create", "Playlists")">Create a new playlist</a>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
-
-
-
+<script>
+    function deletePlaylist(playlistId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This will delete the playlist.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(`deleteForm-${playlistId}`).submit();
+            }
+        });
+    }
+</script>

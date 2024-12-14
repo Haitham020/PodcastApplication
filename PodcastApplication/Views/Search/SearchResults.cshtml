@@ -7,62 +7,48 @@
 }
 
 <style>
-
-    .playlist-card {
-        background-color: lightgrey;
-        border-radius: 20px;
-        overflow: hidden;
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-
-
-    .playlist-img-wrap {
-        width: 100%;
-        height: 200px;
-        overflow: hidden;
-    }
-
-    .playlist-img {
-        object-fit: cover;
-        width: 100%;
-        height: 100%;
-        transition: transform 0.3s ease-in-out;
-    }
-
-    .playlist-card:hover .playlist-img {
-        transform: scale(1.1);
-    }
-
-    .playlist-content {
-        padding: 20px;
-        text-align: center;
-    }
-
-    .playlist-name {
-        font-size: 1.5rem;
-        font-weight: bold;
-    }
-
-    .playlist-creator {
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
+    /* General styles for the public playlists section */
+    
 
     .section-title-wrap {
-        margin-bottom: 30px;
+        margin-bottom: 40px;
     }
 
     .section-title {
         font-size: 2.5rem;
-        font-weight: bold;
+        font-weight: 600;
         color: #333;
     }
 
     .section-description {
         font-size: 1.1rem;
         color: #777;
-        margin-bottom: 40px;
+    }
+
+    .playlist-card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+
+        /* Hover effect on playlist cards */
+        .playlist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+    .playlist-content {
+        padding: 20px;
+    }
+
+    .playlist-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .btn-primary {
@@ -76,7 +62,25 @@
             border-color: #004085;
         }
 
-    
+    .playlist-icon i {
+        font-size: 1.5rem;
+        color: #007bff;
+    }
+
+    .no-playlists {
+        color: #6c757d;
+    }
+
+    /* Custom spacing for buttons */
+    .playlist-card .btn {
+        margin-top: 20px;
+    }
+
+    /* Icon style */
+    .bi {
+        font-size: 2rem;
+        color: #007bff;
+    }
 
 </style>
 
@@ -87,7 +91,7 @@
             <div class="row">
                 <div class="col-lg-12 col-12">
                     <div class="section-title-wrap mb-5">
-                        <h4 class="section-title">All Podcasts</h4>
+                        <h4 class="section-title">Podcasts</h4>
                     </div>
                 </div>
 
@@ -136,7 +140,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-12 col-12">
                     <div class="section-title-wrap mb-5">
-                        <h4 class="section-title">Lastest episodes</h4>
+                        <h4 class="section-title">Episodes</h4>
                     </div>
                 </div>
                 @foreach (var episode in Model.Episodes)
@@ -262,16 +266,19 @@
                 <p class="section-description">Explore the top public playlists curated by users. Click on a playlist to view its saved items.</p>
             </div>
 
-
             <div class="row">
                 @foreach (var playlist in Model.Playlists)
                 {
-
                     <div class="col-lg-4 col-md-6 col-12 mb-4">
-                        <div class="playlist-card shadow-sm">
-                            
-                            <div class="playlist-content p-3">
-                                <h3 class="playlist-name mb-2">@playlist.PlaylistName</h3>
+                        <div class="playlist-card shadow-lg rounded-lg position-relative overflow-hidden">
+
+                            <!-- Playlist Icon -->
+                            <div class="playlist-icon position-absolute top-0 start-0 m-3">
+                                <i class="bi bi-music-note-list"></i> <!-- Playlist icon -->
+                            </div>
+
+                            <div class="playlist-content p-4 text-center">
+                                <h3 class="playlist-name mb-3 text-truncate">@playlist.PlaylistName</h3>
 
                                 <a asp-action="SavedItemsInPlaylist" asp-controller="Playlists"
                                    asp-route-playlistId="@playlist.PlaylistId"
@@ -279,14 +286,12 @@
                                     Go to Playlist
                                 </a>
                             </div>
-                       
                         </div>
                     </div>
                 }
-            </div>        
+            </div>
         </div>
     </section>
-
-    
 }
+
 

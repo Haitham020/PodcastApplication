@@ -18,7 +18,7 @@
                         <div class="custom-block custom-block-full mb-4">
                             <div class="custom-block-image-wrap">
                                 <a href="detail-page.html">
-                                    <img src="~/images/podcast/27376480_7326766.jpg" class="custom-block-image img-fluid" alt="">
+                                    <img src="~/images/podcast/@podcast.PodcastCoverImg" class="custom-block-image img-fluid" alt="">
                                 </a>
                             </div>
 
@@ -31,7 +31,7 @@
                                 </h5>
 
                                 <div class="profile-block d-flex">
-                                    <img src="~/images/profile/woman-posing-black-dress-medium-shot.jpg" class="profile-block-image img-fluid" alt="">
+                                    <img src="~/images/profile/@(podcast.Creator?.ProfileImg ?? "userImg.png" )" class="profile-block-image img-fluid" alt="">
                                     <p>
                                         @podcast.Creator!.UserName
                                         <strong>@podcast.Creator.CreatorGenre</strong>

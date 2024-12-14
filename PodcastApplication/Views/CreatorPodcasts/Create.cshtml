@@ -4,45 +4,50 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1 class="text-center my-4">Create Podcast</h1>
 
-<h4>Podcast</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="PodcastTitle" class="control-label">Title</label>
-                <input asp-for="PodcastTitle" class="form-control" required/>
-                <span asp-validation-for="PodcastTitle" class="text-danger"></span>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Podcast Details</h4>
+                    <form asp-action="Create" enctype="multipart/form-data">
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="PodcastTitle" class="form-label">Title</label>
+                            <input asp-for="PodcastTitle" class="form-control" placeholder="Enter podcast title" required />
+                            <span asp-validation-for="PodcastTitle" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PodcastDescription" class="form-label">Description</label>
+                            <textarea asp-for="PodcastDescription" class="form-control" placeholder="Enter podcast description" rows="3" required></textarea>
+                            <span asp-validation-for="PodcastDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PodcastCoverImg" class="form-label">Cover Image</label>
+                            <input type="file" name="imgFile" asp-for="PodcastCoverImg" class="form-control" required />
+                            <span asp-validation-for="PodcastCoverImg" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="CategoryId" class="form-label">Category</label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Category" required>
+                                <option value="">--- Select Category ---</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="PodcastDescription" class="control-label">Description</label>
-                <input asp-for="PodcastDescription" class="form-control" required />
-                <span asp-validation-for="PodcastDescription" class="text-danger"></span>
-            </div>
-            
-            <div class="form-group">
-                <label asp-for="PodcastCoverImg" class="control-label">Cover Image</label>
-                <input type="file" name="imgFile" asp-for="PodcastCoverImg" class="form-control" required />
-                <span asp-validation-for="PodcastCoverImg" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label">Category</label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Category" required>
-                    <option>--- Select Category ---</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-

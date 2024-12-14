@@ -47,7 +47,7 @@
                     <div class="col-lg-3 col-12">
                         <div class="custom-block-icon-wrap">
                             <div class="custom-block-image-wrap custom-block-image-detail-page">
-                                <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
+                                <img src="~/images/podcast/@Model.Podcast.PodcastCoverImg" class="custom-block-image img-fluid" alt="">
                             </div>
                         </div>
                     </div>
@@ -66,7 +66,6 @@
                             <h4 id="subscriptionCount">
                                 @Model.Podcast.Subscriptions!.Count() Subscriptions
                             </h4>
-                            <h2 class="mb-2">@Model.Podcast.PodcastTitle</h2>
                             <h2 class="mb-2">@Model.Podcast.Category!.CategoryName</h2>
 
                             <p>@Model.Podcast.PodcastDescription</p>
@@ -115,7 +114,7 @@
                             <div class="me-3">
                                 <div class="custom-block-icon-wrap">
                                     <a href="detail-page.html" class="custom-block-image-wrap">
-                                        <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid rounded" alt="">
+                                        <img src="~/images/episodes/@episode.EpisodeCoverImg" class="custom-block-image img-fluid rounded" alt="">
                                     </a>
                                 </div>
 

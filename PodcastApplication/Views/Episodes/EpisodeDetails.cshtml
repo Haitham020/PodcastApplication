@@ -13,35 +13,92 @@
 }
 
 <style>
+    /* General Section Styling */
+    .latest-podcast-section,
+    .related-podcast-section {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
 
+    .section-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #333;
+    }
 
-    .transcript-section {
-        background-color: #f9f9f9;
-        padding: 15px;
+    .custom-block-image-wrap img {
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    }
+
+    .custom-block-info h2,
+    .custom-block-info h5 {
+        font-weight: 500;
+        color: #222;
+    }
+
+    .custom-block-info p {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #555;
+    }
+
+    .audio-player {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
         border-radius: 5px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .audio-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        border-radius: 5px;
+        padding: 8px 12px;
+    }
+
+    .profile-detail-block {
+        background-color: #f0f8ff;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 20px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .transcript-title {
-        font-size: 1.5rem;
-        margin-bottom: 10px;
+    .social-icon-link {
+        color: #555;
+        font-size: 1.2rem;
+        margin-right: 10px;
+        transition: color 0.3s ease-in-out;
     }
 
-    .transcript-content {
-        font-size: 1rem;
-        line-height: 1.5;
+        .social-icon-link:hover {
+            color: #007bff;
+        }
+
+    .related-podcast-section .custom-block {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
     }
 
-    .text-muted {
-        color: #6c757d;
-    }
-
-    .completed-status {
-        float: right;
-        font-weight: bold;
-        color: #17a2b8;
-    }
-
+        .related-podcast-section .custom-block:hover {
+            transform: scale(1.05);
+        }
 </style>
 
 
@@ -64,9 +121,10 @@
             <div class="col-lg-10 col-12">
                 <div class="section-title-wrap mb-5">
                     <h4 class="section-title">@Model.Episode!.EpisodeTitle</h4>
-                    <small class="completed-status">
+                    <small class="completed-status" style="display: inline-block; margin-top: 5px; padding: 2px 5px; border-radius: 3px; background-color: @(Model.Episode.UserEpisodeProgress?.IsCompleted == true ? "#28a745" : "#dc3545"); color: white;">
                         @(Model.Episode.UserEpisodeProgress?.IsCompleted == true ? "Completed" : "Not Completed")
                     </small>
+
                 </div>
                 <div class="row">
                     <div class="col-lg-3 col-12">
@@ -232,8 +290,8 @@
                                     <a asp-action="EpisodeDetails"
                                        asp-controller="Episodes" asp-route-id="@episode.EpisodeId">
                                         @episode.EpisodeTitle
+                                        <br />
                                         @episode.Podcast!.PodcastTitle
-                                        @episode.Podcast.Category!.CategoryName
                                     </a>
                                 </h5>
 
@@ -246,7 +304,6 @@
                                     </p>
                                 </div>
 
-                                <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
 
                                 <div class="custom-block-bottom d-flex justify-content-between mt-3">
                                     <a href="#" class="bi-headphones me-1">

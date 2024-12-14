@@ -18,7 +18,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-12 col-12">
                 <div class="section-title-wrap mb-5">
-                    <h4 class="section-title">Liked Episodes</h4>
+                    <h4 class="section-title">Favorite Episodes</h4>
                 </div>
             </div>
             @if (Model.Any() && Model != null)
@@ -37,17 +37,11 @@
                                     <a class="custom-block-image-wrap">
                                         <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
 
-                                        <a href="#" class="custom-block-icon">
-                                            <i class="bi-play-fill"></i>
-                                        </a>
+                                        
                                     </a>
                                 </div>
 
-                                <div class="mt-2">
-                                    <a href="#" class="btn custom-btn">
-                                        Subscribe
-                                    </a>
-                                </div>
+                               
                             </div>
 
                             <div class="custom-block-info">
@@ -95,7 +89,7 @@
         </div>
         <div>
             <a class="text" asp-action="AllEpisodes" asp-controller="Episodes">
-                Discover Episodes
+                <b>Discover Episodes</b>
             </a>
         </div>
     </div>

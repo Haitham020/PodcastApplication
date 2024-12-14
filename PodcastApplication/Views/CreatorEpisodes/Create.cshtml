@@ -4,73 +4,81 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1 class="text-center my-4">Create Episode</h1>
 
-<h4>Episode</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="EpisodeTitle" class="control-label"></label>
-                <input asp-for="EpisodeTitle" class="form-control" />
-                <span asp-validation-for="EpisodeTitle" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EpisodeDescription" class="control-label"></label>
-                <input asp-for="EpisodeDescription" class="form-control" />
-                <span asp-validation-for="EpisodeDescription" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AudioFile" class="control-label"></label>
-                <input id="audioFileInput" asp-for="AudioFile" type="file" class="form-control" />
-                <span asp-validation-for="AudioFile" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EpisodeCoverImg" class="control-label"></label>
-                <input asp-for="EpisodeCoverImg" name="imgFile" type="file" class="form-control" />
-                <span asp-validation-for="EpisodeCoverImg" class="text-danger"></span>
-            </div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Episode Details</h4>
+                    <form asp-action="Create" enctype="multipart/form-data">
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-            <div class="form-group">
-                <label asp-for="EpisodeDuration" class="control-label">Episode Duration</label>
-                <input id="EpisodeDuration" asp-for="EpisodeDuration" class="form-control" readonly />
-                <span asp-validation-for="EpisodeDuration" class="text-secondary">Check the uploaded audio file</span>
-                <span id="loadingIndicator" style="display:none; margin-left:10px;">
-                    <i class="fa fa-spinner fa-spin"></i> Loading...
-                </span>
+                        <div class="mb-3">
+                            <label asp-for="EpisodeTitle" class="form-label">Title</label>
+                            <input asp-for="EpisodeTitle" class="form-control" placeholder="Enter episode title" required />
+                            <span asp-validation-for="EpisodeTitle" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EpisodeDescription" class="form-label">Description</label>
+                            <textarea asp-for="EpisodeDescription" class="form-control" placeholder="Enter episode description" rows="3" required></textarea>
+                            <span asp-validation-for="EpisodeDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="AudioFile" class="form-label">Audio File</label>
+                            <input id="audioFileInput" asp-for="AudioFile" type="file" class="form-control" required />
+                            <span asp-validation-for="AudioFile" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EpisodeCoverImg" class="form-label">Cover Image</label>
+                            <input asp-for="EpisodeCoverImg" name="imgFile" type="file" class="form-control" required />
+                            <span asp-validation-for="EpisodeCoverImg" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EpisodeDuration" class="form-label">Episode Duration</label>
+                            <div class="input-group">
+                                <input id="EpisodeDuration" asp-for="EpisodeDuration" class="form-control" readonly />
+                                <span id="loadingIndicator" class="input-group-text" style="display:none;">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                            </div>
+                            <small class="text-muted">Duration will be calculated after uploading the audio file.</small>
+                            <span asp-validation-for="EpisodeDuration" class="text-secondary"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="PodcastId" class="form-label">Podcast</label>
+                            <select asp-for="PodcastId" class="form-select" asp-items="ViewBag.PodcastId" required>
+                                <option value="">--- Select Podcast ---</option>
+                            </select>
+                            <span asp-validation-for="PodcastId" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-           
-            <div class="form-group">
-                <label asp-for="PodcastId" class="control-label">Podcast</label>
-                <select asp-for="PodcastId" class ="form-control" asp-items="ViewBag.PodcastId" required></select>
-            </div>
-           
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
 <script>
     $(document).ready(function () {
-
         $('#audioFileInput').on('change', function () {
             var fileInput = this;
 
             if (fileInput.files && fileInput.files[0]) {
                 var formData = new FormData();
                 formData.append("audioFile", fileInput.files[0]);
-                
 
                 $('#loadingIndicator').show();
 
@@ -83,7 +91,6 @@
                     success: function (response) {
                         $('#loadingIndicator').hide();
                         if (response.episodeDuration) {
-                            
                             $('#EpisodeDuration').val(response.episodeDuration);
                         } else if (response.error) {
                             alert(response.error);
@@ -99,14 +106,8 @@
     });
 </script>
 
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-
-
-
-
-

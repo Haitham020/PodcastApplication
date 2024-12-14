@@ -242,11 +242,7 @@ namespace PodcastApplication.Controllers
         {
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                return NotFound();
-            }
-
+            
             var playlist = await _context.Playlists
                  .Include(p => p.PlaylistItems!.Where(x => x.IsActive))
                  .ThenInclude(pi => pi.Podcast)

@@ -42,9 +42,6 @@
 
         @await Component.InvokeAsync("Menu")
 
-        
-
-
         @if ((ViewContext.RouteData.Values["Controller"]?.ToString() == "Account" &&
         ViewContext.RouteData.Values["Action"]?.ToString() == "Register"))
         {
@@ -170,7 +167,7 @@
             <div class="row align-items-center">
 
                 <div class="col-lg-2 col-md-3 col-12">
-                    <a class="navbar-brand" href="index.html">
+                    <a class="navbar-brand" href=@Url.Action("Index", "Home")>
                         <img src="~/images/pod-talk-logo.png" class="logo-image img-fluid" alt="templatemo pod talk">
                     </a>
                 </div>
@@ -183,23 +180,16 @@
 
                         <li class="site-footer-link-item">
                             <a href=@Url.Action("AllEpisodes", "Episodes") class="site-footer-link">Browse episodes</a>
-                        </li>
-
-                        <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Help Center</a>
-                        </li>
-
-                        <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Contact Us</a>
-                        </li>
+                        </li>  
+                        
+                                           
                     </ul>
                 </div>
 
                 <div class="col-lg-3 col-12">
                     <p class="copyright-text mb-0">
                          © 2024 PodTalk
-                        <br><br>
-                        Design: <a rel="nofollow" href="https://templatemo.com/page/1" target="_parent">TemplateMo</a>
+                        
                     </p>
                 </div>
             </div>

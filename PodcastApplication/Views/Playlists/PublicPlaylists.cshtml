@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Playlist>
+﻿@model IEnumerable<PodcastApplication.Models.Playlist>
 
 @using PodcastApplication.Data;
 @using Microsoft.AspNetCore.Identity
@@ -19,45 +19,43 @@
 
         @if (Model.Any() && Model != null)
         {
-            <div class="row">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 @foreach (var playlist in Model)
                 {
                     var userId = _userManager.GetUserId(User);
-
                     var savePlaylistExists = _db.SavedPlaylists.FirstOrDefault(x => x.PlaylistId == playlist.PlaylistId && x.UserId == userId);
 
-                    <div class="col-lg-4 col-md-6 col-12 mb-4">
-                        <div class="playlist-card shadow-sm">
-                           
-                            <div class="playlist-content p-3">
-                                <h3 class="playlist-name mb-2">@playlist.PlaylistName</h3>
-                                <p class="playlist-creator text-muted">by @playlist.User!.UserName</p>
+                    <div class="col">
+                        <div class="playlist-card shadow-lg border rounded-3">
+                            <div class="playlist-header text-center p-4">
+                                <!-- Playlist Icon -->
+                                <i class="bi bi-music-note-beamed playlist-icon"></i>
+                            </div>
+                            <div class="playlist-content p-4">
+                                <h3 class="playlist-name mb-3">@playlist.PlaylistName</h3>
+                                <p class="playlist-creator text-muted mb-4">by @playlist.User!.UserName</p>
 
                                 <a asp-action="SavedItemsInPlaylist" asp-controller="Playlists"
                                    asp-route-playlistId="@playlist.PlaylistId"
-                                   class="btn btn-primary btn-sm mt-3 w-100">
+                                   class="btn btn-primary w-100 mb-3">
                                     Go to Playlist
                                 </a>
                             </div>
 
-                            <div class="d-flex flex-column ms-auto">
-
+                            <div class="d-flex justify-content-end p-3">
                                 @if (savePlaylistExists != null)
                                 {
-                                    <a id="favBtn-@playlist.PlaylistId" class="badge ms-auto" onclick="toggleSavePLaylist('@playlist.PlaylistId', false)">
+                                    <a id="favBtn-@playlist.PlaylistId" class="badge" onclick="toggleSavePLaylist('@playlist.PlaylistId', false)">
                                         <i class="bi-bookmark-fill"></i>
                                     </a>
                                 }
                                 else
                                 {
-                                    <a id="favBtn-@playlist.PlaylistId" class="badge ms-auto" onclick="toggleSavePLaylist('@playlist.PlaylistId', true)">
+                                    <a id="favBtn-@playlist.PlaylistId" class="badge" onclick="toggleSavePLaylist('@playlist.PlaylistId', true)">
                                         <i class="bi-bookmark"></i>
                                     </a>
                                 }
-
                             </div>
-
-
                         </div>
                     </div>
                 }
@@ -73,32 +71,27 @@
 </section>
 
 <style>
-
     .playlist-card {
-        background-color: #f8f9fa; 
-        border: 1px solid #ced4da; 
+        background-color: #f8f9fa;
+        border: 1px solid #e3e6ea;
         border-radius: 10px;
         overflow: hidden;
-        transition: transform 0.3s, box-shadow 0.3s;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
+        .playlist-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
 
-
-    .playlist-img-wrap {
-        width: 100%;
-        height: 200px;
-        overflow: hidden;
+    .playlist-header {
+        background-color: #007bff;
+        color: white;
+        padding: 20px;
     }
 
-    .playlist-img {
-        object-fit: cover;
-        width: 100%;
-        height: 100%;
-        transition: transform 0.3s ease-in-out;
-    }
-
-    .playlist-card:hover .playlist-img {
-        transform: scale(1.1);
+    .playlist-icon {
+        font-size: 2.5rem;
     }
 
     .playlist-content {
@@ -109,10 +102,11 @@
     .playlist-name {
         font-size: 1.5rem;
         font-weight: bold;
+        color: #333;
     }
 
     .playlist-creator {
-        font-size: 0.9rem;
+        font-size: 1rem;
         color: #6c757d;
     }
 
@@ -143,10 +137,24 @@
             border-color: #004085;
         }
 
+    .badge {
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #007bff;
+    }
+
+        .badge:hover {
+            color: #0056b3;
+        }
+
     .no-playlists {
         color: #6c757d;
     }
 
+    /* Spacing adjustments */
+    .row-cols-1 .col {
+        margin-bottom: 30px;
+    }
 </style>
 
 <script>
@@ -173,7 +181,4 @@
             }
         });
     }
-
-
-
 </script>

@@ -19,7 +19,6 @@
 
         @if (Model.Any() && Model != null)
         {
-
             <div class="row">
                 @foreach (var playlist in Model)
                 {
@@ -27,28 +26,28 @@
 
                     var savePlaylistExists = _db.SavedPlaylists.FirstOrDefault(x => x.PlaylistId == playlist.PlaylistId && x.UserId == userId);
 
-                    
                     <div class="col-lg-4 col-md-6 col-12 mb-4" id="episode-block-@playlist.PlaylistId">
-                        <div class="playlist-card shadow-sm">
-                            <div class="d-flex flex-column ms-auto">
-
-                                <a id="favBtn-@playlist.PlaylistId" class="badge ms-auto" onclick="toggleSavePLaylist('@playlist.PlaylistId', false)">
-                                    <i class="bi-bookmark-fill"></i>
-                                </a>
-
+                        <div class="playlist-card shadow-lg rounded-lg position-relative overflow-hidden">
+                            <div class="playlist-icon position-absolute top-0 start-0 m-3">
+                                <i class="bi bi-music-note-list"></i> <!-- Add the playlist icon here -->
                             </div>
-                            
-                            <div class="playlist-content p-3">
-                                <h3 class="playlist-name mb-2">@playlist.PlaylistName</h3>
-                                <p class="playlist-creator text-muted">by @playlist.User!.UserName</p>
+
+                            <div class="playlist-content p-4 text-center">
+                                <h3 class="playlist-name mb-3 text-truncate">@playlist.PlaylistName</h3>
+                                <p class="playlist-creator text-muted mb-3">by @playlist.User!.UserName</p>
 
                                 <a asp-action="SavedItemsInPlaylist" asp-controller="Playlists"
                                    asp-route-playlistId="@playlist.PlaylistId"
                                    class="btn btn-primary btn-sm mt-3 w-100">
                                     Go to Playlist
                                 </a>
-                            </div>
 
+                                <!-- Save/Remove playlist button -->
+                                <a id="favBtn-@playlist.PlaylistId" class="badge ms-auto position-absolute top-0 end-0 mt-3 me-3"
+                                   onclick="toggleSavePLaylist('@playlist.PlaylistId', false)">
+                                    <i class="bi-bookmark-fill"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 }
@@ -64,62 +63,56 @@
 </section>
 
 <style>
-
-    .playlist-card {
-        background-color: white;
-        border-radius: 10px;
-        overflow: hidden;
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-
-
-    .playlist-img-wrap {
-        width: 100%;
-        height: 200px;
-        overflow: hidden;
-    }
-
-    .playlist-img {
-        object-fit: cover;
-        width: 100%;
-        height: 100%;
-        transition: transform 0.3s ease-in-out;
-    }
-
-    .playlist-card:hover .playlist-img {
-        transform: scale(1.1);
-    }
-
-    .playlist-content {
-        padding: 20px;
-        text-align: center;
-    }
-
-    .playlist-name {
-        font-size: 1.5rem;
-        font-weight: bold;
-    }
-
-    .playlist-creator {
-        font-size: 0.9rem;
-        color: #6c757d;
+    /* General styles for the playlist section */
+    .public-playlists-section {
+        background-color: #f9f9f9;
     }
 
     .section-title-wrap {
-        margin-bottom: 30px;
+        margin-bottom: 40px;
     }
 
     .section-title {
         font-size: 2.5rem;
-        font-weight: bold;
+        font-weight: 600;
         color: #333;
     }
 
     .section-description {
         font-size: 1.1rem;
         color: #777;
-        margin-bottom: 40px;
+    }
+
+    .playlist-card {
+        background-color: #ffffff;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+
+        /* Hover effect on playlist cards */
+        .playlist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+    .playlist-content {
+        padding: 20px;
+    }
+
+    .playlist-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .playlist-creator {
+        font-size: 0.9rem;
+        color: #6c757d;
     }
 
     .btn-primary {
@@ -133,14 +126,40 @@
             border-color: #004085;
         }
 
+    .playlist-icon i {
+        font-size: 1.5rem;
+        color: #007bff;
+    }
+
     .no-playlists {
         color: #6c757d;
+    }
+
+    /* Icon style */
+    .bi {
+        font-size: 1.8rem;
+    }
+
+    .badge {
+        background-color: #fff;
+        color: #007bff;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+        .badge:hover {
+            color: #0056b3;
+        }
+
+    /* Custom spacing for buttons */
+    .playlist-card .badge {
+        top: 15px;
+        right: 15px;
     }
 
 </style>
 
 <script>
-
     function toggleSavePLaylist(playlistId, isSaving) {
         $.ajax({
             url: '/SavePlaylists/ToggleSavePLaylist',
@@ -151,10 +170,7 @@
             },
             success: function (response) {
                 if (!isSaving) {
-                    if (confirm("Are you sure you want to remove this episode from favorites?")) {
-                        $(`#episode-block-${playlistId}`).remove();
-
-                    }
+                    $(`#episode-block-${playlistId}`).remove();
                 }
 
             },
@@ -163,6 +179,4 @@
             }
         });
     }
-
-
 </script>

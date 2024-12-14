@@ -15,79 +15,116 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10 col-12">
-                <div class="section-title-wrap mb-5">
-                    <h4 class="section-title">@Model.Episode!.EpisodeTitle</h4>
+                <div class="section-title-wrap mb-5 text-center">
+                    <h4 class="section-title text-primary">@Model.Episode!.EpisodeTitle</h4>
                 </div>
-                <div class="row">
-                    <div class="col-lg-3 col-12">
-                        <div class="custom-block-icon-wrap">
-                            <div class="custom-block-image-wrap custom-block-image-detail-page">
-                                <img src="~/images/podcast/11683425_4790593.jpg" class="custom-block-image img-fluid" alt="">
+                <div class="row g-4">
+                    <!-- Episode Cover -->
+                    <div class="col-lg-3 col-md-4 col-12">
+                        <div class="custom-block-icon-wrap text-center">
+                            <div class="custom-block-image-wrap custom-block-image-detail-page shadow-sm rounded">
+                                <img src="~/images/episodes/@Model.Episode.EpisodeCoverImg"
+                                     class="custom-block-image img-fluid rounded"
+                                     alt="Episode Cover">
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-9 col-12">
-                        <div class="custom-block-info">
-                            <div class="custom-block-top d-flex mb-1">
-                                <small class="me-4">
-                                    <button id="playPauseBtn" class="btn btn-primary"><i class="bi-play"></i> Play now</button>
+                    <!-- Episode Details -->
+                    <div class="col-lg-9 col-md-8 col-12">
+                        <div class="custom-block-info p-4 bg-light shadow-sm rounded">
+                            <div class="d-flex flex-wrap align-items-center mb-3">
+                                <button id="playPauseBtn" class="btn btn-primary me-3">
+                                    <i class="bi-play-fill me-1"></i>Play now
+                                </button>
+                                <small class="text-muted me-4">
+                                    <i class="bi-clock-fill me-1"></i>
+                                    @Model.Episode.EpisodeDuration
                                 </small>
-                                <small>
-                                    <i class="bi-clock-fill custom-icon"></i> @Model.Episode.EpisodeDuration
+                                <small class="text-muted me-4">
+                                    Episode <span class="badge bg-primary">@Model.EpisodeNumber</span>
                                 </small>
-                                <small class="ms-auto">
-                                    Episode <span class="badge">
-                                        @Model.EpisodeNumber
+                                <small class="ms-auto text-muted">
+                                    Likes <span id="like-count" class="badge bg-success">
+                                        @Model.Episode.EpisodeLikes!.Count()
                                     </span>
                                 </small>
-                                <small class="ms-auto">Likes <span id="like-count" class="badge">@Model.Episode.EpisodeLikes!.Count()</span></small>
                             </div>
-                            <h2 class="mb-2">@Model.Episode.EpisodeTitle</h2>
-                            <a asp-action="StagingPodcast" asp-route-id="@Model.Episode.PodcastId" class="mb-2"><strong>@Model.Episode.Podcast!.PodcastTitle</strong></a>
-                            <p>@Model.Episode.EpisodeDescription</p>
 
-                            <div class="audio-player">
-                                <audio id="audioPlayer" src="~/audio/@Model.Episode.AudioFile" preload="metadata" controls></audio>
-                                <div class="audio-controls">
-                                    <button class="btn" id="rewindBtn">⏪ 15s</button>
+                            <h2 class="mb-2 text-dark">@Model.Episode.EpisodeTitle</h2>
+                            <a asp-action="StagingPodcast" asp-route-id="@Model.Episode.PodcastId"
+                               class="text-decoration-none text-primary mb-3 d-block">
+                                <strong>@Model.Episode.Podcast!.PodcastTitle</strong>
+                            </a>
+                            <p class="text-secondary">@Model.Episode.EpisodeDescription</p>
 
-                                    <button class="btn" id="forwardBtn">⏩ 15s</button>
-                                    <span id="currentTime">00:00</span> / <span id="totalTime">00:00</span>
+                            <!-- Audio Player -->
+                            <div class="audio-player mt-4 mb-4">
+                                <audio id="audioPlayer" src="~/audio/@Model.Episode.AudioFile"
+                                       preload="metadata" controls
+                                       class="w-100 rounded shadow-sm"></audio>
+                                <div class="audio-controls d-flex align-items-center justify-content-between mt-2">
+                                    <button class="btn btn-outline-secondary" id="rewindBtn">⏪ 15s</button>
+                                    <span id="currentTime" class="text-muted">00:00</span> /
+                                    <span id="totalTime" class="text-muted">00:00</span>
+                                    <button class="btn btn-outline-secondary" id="forwardBtn">⏩ 15s</button>
                                 </div>
                             </div>
-                            <div>
+
+                            <!-- Publish Button -->
+                            <div class="mt-4">
                                 <form asp-action="TogglePublishEpisode" asp-controller="Creators" method="post" id="publishForm">
                                     <input type="hidden" name="id" value="@Model.Episode.EpisodeId" />
                                     @if (Model.Episode.IsPublic)
                                     {
-                                        <button type="button" id="toggleButton" class="btn btn-secondary" onclick="togglePublish()">UnPublish</button>
+                                        <button type="button" id="toggleButton"
+                                                class="btn btn-secondary"
+                                                onclick="togglePublish()">
+                                            <i class="bi-eye-slash-fill"></i> Unpublish
+                                        </button>
                                     }
                                     else
                                     {
-                                        <button type="button" id="toggleButton" class="btn btn-success" onclick="togglePublish()">Publish</button>
+                                        <button type="button" id="toggleButton"
+                                                class="btn btn-success"
+                                                onclick="togglePublish()">
+                                            <i class="bi-eye-fill"></i> Publish
+                                        </button>
                                     }
-
-
                                 </form>
                             </div>
-                            @if (Model.Episode.Transcript != null)
-                            {
-                                <textarea id="transcriptTextArea" style="width:100%; height:200px;">@Model.Episode.Transcript</textarea>
-                                <button id="saveTranscriptButton" class="btn btn-success">Edit & Save Transcript</button>
 
-                            }
-                            else
-                            {
-                                <button id="transcribeButton" class="btn btn-primary">Transcribe Audio</button>
-                                <div id="transcriptionResult">
-                                    <textarea id="transcriptTextArea" style="display:none; width:100%; height:200px;"></textarea>
-                                    <button id="saveTranscriptButton" style="display:none;" class="btn btn-success">Edit & Save Transcript</button>
-                                </div>
-                            }
-
-
-
+                            <!-- Transcript Section -->
+                            <div class="mt-4">
+                                @if (Model.Episode.Transcript != null)
+                                {
+                                    <textarea id="transcriptTextArea"
+                                              class="form-control shadow-sm mb-3"
+                                              rows="6">@Model.Episode.Transcript</textarea>
+                                    <button id="saveTranscriptButton"
+                                            class="btn btn-success">
+                                        <i class="bi-save-fill"></i> Save Transcript
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button id="transcribeButton"
+                                            class="btn btn-primary">
+                                        <i class="bi-mic-fill"></i> Transcribe Audio
+                                    </button>
+                                    <div id="transcriptionResult" class="mt-3">
+                                        <textarea id="transcriptTextArea"
+                                                  style="display:none;"
+                                                  class="form-control shadow-sm mb-3"
+                                                  rows="6"></textarea>
+                                        <button id="saveTranscriptButton"
+                                                style="display:none;"
+                                                class="btn btn-success">
+                                            <i class="bi-save-fill"></i> Save Transcript
+                                        </button>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
