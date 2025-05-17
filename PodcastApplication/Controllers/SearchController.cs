@@ -18,7 +18,7 @@ namespace PodcastApplication.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Search(string query)
+        public async Task<IActionResult> Search([FromQuery] string query)
         {
             if (string.IsNullOrEmpty(query))
             {
