@@ -10,8 +10,8 @@ namespace PodcastApplication.Data
         {
             
         }
-        public required DbSet<Category> Categories { get; set; }
-        public required DbSet<Comment> Comments { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Comment> Comments { get; set; }
         public DbSet<Episode> Episodes { get; set; }
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Podcast> Podcasts { get; set; }
